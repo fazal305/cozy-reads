@@ -188,6 +188,32 @@ export default function LoginPage() {
                 ? 'Create Account'
                 : 'Sign In'}
             </button>
+
+            <div className="pt-2 text-center">
+              {isSignUp ? (
+                <p className="text-xs text-cozy-muted">
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => handleModeSwitch(false)}
+                    className="text-cozy-accent font-medium hover:underline focus:outline-none"
+                  >
+                    Sign in
+                  </button>
+                </p>
+              ) : (
+                <p className="text-xs text-cozy-muted">
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => handleModeSwitch(true)}
+                    className="text-cozy-accent font-medium hover:underline focus:outline-none"
+                  >
+                    Create an account
+                  </button>
+                </p>
+              )}
+            </div>
           </form>
         </div>
 
