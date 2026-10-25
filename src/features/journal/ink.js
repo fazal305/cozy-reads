@@ -1,6 +1,21 @@
+import { getStroke } from 'perfect-freehand';
 import { PAGE_W, PAGE_H, round } from './templates';
 
 // Strokes store a flat normalised point list: pts = [x0, y0, x1, y1, ...], optional pr = [p0, p1, ...].
+// Optional: sn = 1 for a snapped shape (even width, no taper), tc = bitmask of ends cut by the eraser (1 start, 2 end).
+
+export const PEN_TOOLS = ['fountain', 'ballpoint', 'brush', 'pencil'];
+export const isPen = (tool) => tool === 'pen' || PEN_TOOLS.includes(tool);
+
+// scale: drawn width / stored size. weight: how much real pressure counts. speed: how much fast strokes thin out.
+const PENS = {
+  fountain: { scale: 1.3, thinning: 0.6, smoothing: 0.6, streamline: 0.2, taper: 3, weight: 0.8, speed: 0.45 },
+  ballpoint: { scale: 1, thinning: 0.15, smoothing: 0.5, streamline: 0.25, taper: 0, weight: 0.45, speed: 0 },
+  brush: { scale: 2.2, thinning: 0.88, smoothing: 0.65, streamline: 0.25, taper: 6, weight: 1, speed: 0.35 },
+  pencil: { scale: 1.05, thinning: 0.3, smoothing: 0.5, streamline: 0.25, taper: 1, weight: 0.6, speed: 0 },
+};
+
+export const penScale = (tool) => PENS[tool]?.scale || 1;
 
 function toUnits(pts) {
   const out = [];
@@ -63,8 +78,60 @@ function pressureOutline(points, pressures, width) {
   );
 }
 
-// Returns { d, filled } in page units (PAGE_W x PAGE_H).
-export function strokeGeometry(stroke) {
+function outlinePath(outline) {
+  const n = outline.length;
+  if (!n) return '';
+  let d = `M${f(outline[0][0])} ${f(outline[0][1])} Q`;
+  for (let i = 0; i < n; i++) {
+    const [x0, y0] = outline[i];
+    const [x1, y1] = outline[(i + 1) % n];
+    d += `${f(x0)} ${f(y0)} ${f((x0 + x1) / 2)} ${f((y0 + y1) / 2)} `;
+  }
+  return `${d}Z`;
+}
+
+// Pressure per point: real pen pressure mixed with speed (wider gaps between samples = faster = thinner).
+function penPressures(points, stroke, spec) {
+  const hasPr = stroke.pr && stroke.pr.length;
+  const speed = hasPr ? spec.speed : Math.min(1, spec.speed * 1.6);
+  const out = [];
+  let sp = 0.5;
+  for (let i = 0; i < points.length; i++) {
+    if (i) {
+      const d = Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]);
+      sp += (Math.max(0, 1 - d / 24) - sp) * 0.35;
+    }
+    const real = hasPr ? stroke.pr[Math.min(i, stroke.pr.length - 1)] ?? 0.5 : 0.5;
+    const base = 0.5 + (real - 0.5) * spec.weight;
+    out.push(base * (1 - speed) + sp * speed);
+  }
+  return out;
+}
+
+function penOutline(stroke, last) {
+  const spec = PENS[stroke.tool];
+  const points = toUnits(stroke.pts);
+  const width = stroke.size * PAGE_W;
+  const snapped = !!stroke.sn;
+  const pr = snapped ? null : penPressures(points, stroke, spec);
+  const input = points.map(([x, y], i) => [x, y, pr ? pr[i] : 0.5]);
+  const tc = stroke.tc || 0;
+  const taper = snapped ? 0 : spec.taper * width;
+  const outline = getStroke(input, {
+    size: width * spec.scale,
+    thinning: snapped ? 0 : spec.thinning,
+    smoothing: spec.smoothing,
+    streamline: snapped ? 0 : spec.streamline,
+    simulatePressure: false,
+    start: { taper: tc & 1 ? 0 : taper, cap: true },
+    end: { taper: tc & 2 ? 0 : taper, cap: true },
+    last,
+  });
+  return outlinePath(outline);
+}
+
+function buildGeometry(stroke, last = true) {
+  if (PENS[stroke.tool]) return { d: penOutline(stroke, last), filled: true };
   const points = toUnits(stroke.pts);
   const width = stroke.size * PAGE_W;
   if (stroke.pr && stroke.pr.length && stroke.tool === 'pen') {
@@ -73,13 +140,74 @@ export function strokeGeometry(stroke) {
   return { d: smoothLine(points), filled: false };
 }
 
+const cache = new WeakMap();
+
+// Returns { d, filled } in page units (PAGE_W x PAGE_H). Saved strokes never change, so results are cached.
+export function strokeGeometry(stroke) {
+  let g = cache.get(stroke);
+  if (!g) {
+    g = buildGeometry(stroke);
+    cache.set(stroke, g);
+  }
+  return g;
+}
+
+// For a stroke still being drawn: not cached, end not tapered yet.
+export function liveGeometry(stroke) {
+  return buildGeometry(stroke, false);
+}
+
 export function strokeStyle(stroke) {
   const highlighter = stroke.tool === 'highlighter';
   return {
     width: stroke.size * PAGE_W,
-    opacity: highlighter ? 0.38 : 1,
+    opacity: highlighter ? 0.38 : stroke.tool === 'pencil' ? 0.82 : 1,
     cap: highlighter ? 'butt' : 'round',
   };
+}
+
+// Paints one stroke on a 2D context already scaled to page units.
+export function paintStroke(ctx, stroke, geometry) {
+  const { d, filled } = geometry;
+  const st = strokeStyle(stroke);
+  const path = new Path2D(d);
+  ctx.globalAlpha = st.opacity;
+  if (filled) {
+    ctx.fillStyle = stroke.color;
+    ctx.fill(path);
+  } else {
+    ctx.strokeStyle = stroke.color;
+    ctx.lineWidth = st.width;
+    ctx.lineCap = st.cap;
+    ctx.lineJoin = 'round';
+    ctx.stroke(path);
+  }
+  ctx.globalAlpha = 1;
+}
+
+// Pencil grain: a small tile of soft noise used as a mask, so SVG and the PNG export match.
+export const GRAIN_TILE = 40;
+let grainCanvas = null;
+let grainUrl = '';
+export function grainTile() {
+  if (!grainCanvas && typeof document !== 'undefined') {
+    const size = 64;
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext('2d');
+    const img = ctx.createImageData(size, size);
+    let seed = 7;
+    for (let i = 0; i < size * size; i++) {
+      seed = (seed * 16807) % 2147483647;
+      const a = 0.5 + ((seed % 1000) / 1000) * 0.5;
+      img.data.set([255, 255, 255, Math.round(a * 255)], i * 4);
+    }
+    ctx.putImageData(img, 0, 0);
+    grainCanvas = c;
+    grainUrl = c.toDataURL('image/png');
+  }
+  return { canvas: grainCanvas, url: grainUrl };
 }
 
 // Light streamlining while drawing; skips points too close to the previous one.
@@ -109,6 +237,7 @@ export function endPoint(raw, x, y, pressure) {
 
 export function finishStroke(raw) {
   const stroke = { ...raw, pts: raw.pts.map((v) => round(v, 3)) };
+  if (!stroke.pr) delete stroke.pr;
   if (raw.pr) {
     const pr = raw.pr.map((v) => round(v, 2));
     const varies = pr.some((p) => Math.abs(p - pr[0]) > 0.04);
@@ -149,14 +278,15 @@ function resample(item, spacing) {
 }
 
 // Removes the parts of strokes within the eraser circle, splitting strokes where needed.
-export function eraseAt(items, x, y, eraserSize, makeId) {
+// opts.whole removes every stroke it touches; opts.only limits which strokes can be erased.
+export function eraseAt(items, x, y, eraserSize, makeId, opts = {}) {
   let changed = false;
   const radius = (eraserSize * PAGE_W) / 2;
   const ex = x * PAGE_W;
   const ey = y * PAGE_H;
   const next = [];
   for (const original of items) {
-    if (original.type !== 'stroke') {
+    if (original.type !== 'stroke' || (opts.only && !opts.only(original))) {
       next.push(original);
       continue;
     }
@@ -171,7 +301,10 @@ export function eraseAt(items, x, y, eraserSize, makeId) {
       next.push(original);
       continue;
     }
+    changed = true;
+    if (opts.whole) continue;
     const item = resample(original, Math.max(2, radius / 2));
+    const count = item.pts.length / 2;
     const runs = [];
     let run = null;
     for (let i = 0; i < item.pts.length; i += 2) {
@@ -180,18 +313,23 @@ export function eraseAt(items, x, y, eraserSize, makeId) {
         run = null;
       } else {
         if (!run) {
-          run = { pts: [], pr: item.pr ? [] : null };
+          run = { pts: [], pr: item.pr ? [] : null, first: i / 2 };
           runs.push(run);
         }
         run.pts.push(item.pts[i], item.pts[i + 1]);
+        run.last = i / 2;
         if (run.pr) run.pr.push(item.pr[i / 2] ?? 0.5);
       }
     }
-    changed = true;
     runs.forEach((r, index) => {
       if (r.pts.length < 4) return;
       const piece = { ...item, id: index === 0 ? item.id : makeId(), pts: r.pts };
       if (r.pr) piece.pr = r.pr;
+      if (PEN_TOOLS.includes(item.tool)) {
+        const tc = (r.first > 0 ? 1 : (item.tc || 0) & 1) | (r.last < count - 1 ? 2 : (item.tc || 0) & 2);
+        if (tc) piece.tc = tc;
+        else delete piece.tc;
+      }
       next.push(piece);
     });
   }
@@ -199,14 +337,14 @@ export function eraseAt(items, x, y, eraserSize, makeId) {
 }
 
 // Erases along the segment between two eraser positions.
-export function eraseAlong(items, from, to, eraserSize, makeId) {
+export function eraseAlong(items, from, to, eraserSize, makeId, opts) {
   const step = (eraserSize * PAGE_W) / 3;
   const dist = Math.hypot((to.x - from.x) * PAGE_W, (to.y - from.y) * PAGE_H);
   const steps = Math.max(1, Math.ceil(dist / step));
   let result = items;
   for (let k = 1; k <= steps; k++) {
     const t = k / steps;
-    result = eraseAt(result, from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t, eraserSize, makeId);
+    result = eraseAt(result, from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t, eraserSize, makeId, opts);
   }
   return result;
 }

@@ -1,6 +1,6 @@
 import { STICKERS } from '../../data/stickers';
-import { strokeGeometry, strokeStyle } from './ink';
-import { imageValue } from './layout';
+import { strokeGeometry, paintStroke, grainTile, GRAIN_TILE } from './ink';
+import { imageValue, pageLayers } from './layout';
 import { PAGE_W, PAGE_H, PAGE_RATIO, fontCss } from './templates';
 import { CHECK, RATING, MOOD, MOODS, TABLE, QUOTE, STAR_D, CHILI_D, quoteSize } from './elements';
 import { resolveCoverSrc } from '../../lib/coverUrls';
@@ -230,6 +230,34 @@ function drawElement(ctx, item, x, y, w) {
   }
 }
 
+// Pencil strokes are painted on a scratch canvas, masked by the grain tile, then copied over.
+function drawStroke(ctx, item, scratch) {
+  const geometry = strokeGeometry(item);
+  if (item.tool !== 'pencil') {
+    ctx.save();
+    ctx.scale(OUT_W / PAGE_W, OUT_H / PAGE_H);
+    paintStroke(ctx, item, geometry);
+    ctx.restore();
+    return;
+  }
+  const s = scratch.getContext('2d');
+  s.setTransform(1, 0, 0, 1, 0, 0);
+  s.globalCompositeOperation = 'source-over';
+  s.clearRect(0, 0, OUT_W, OUT_H);
+  s.scale(OUT_W / PAGE_W, OUT_H / PAGE_H);
+  s.fillStyle = item.color;
+  s.fill(new Path2D(geometry.d));
+  s.globalCompositeOperation = 'destination-in';
+  const pattern = s.createPattern(grainTile().canvas, 'repeat');
+  pattern.setTransform(new DOMMatrix().scale(GRAIN_TILE / grainTile().canvas.width));
+  s.fillStyle = pattern;
+  s.fillRect(0, 0, PAGE_W, PAGE_H);
+  ctx.save();
+  ctx.globalAlpha = 0.82;
+  ctx.drawImage(scratch, 0, 0);
+  ctx.restore();
+}
+
 // Draws the page on a canvas and downloads it. Returns { skipped } (images blocked by CORS).
 export async function exportPagePng({ page, root, background, filename }) {
   const canvas = document.createElement('canvas');
@@ -246,25 +274,14 @@ export async function exportPagePng({ page, root, background, filename }) {
 
   ctx.drawImage(await svgImage(background, OUT_W, OUT_H), 0, 0, OUT_W, OUT_H);
 
-  for (const item of page.items || []) {
+  const scratch = document.createElement('canvas');
+  scratch.width = OUT_W;
+  scratch.height = OUT_H;
+  const ordered = pageLayers(page.items || []).flatMap((layer) => layer.strokes || [layer.item]);
+
+  for (const item of ordered) {
     if (item.type === 'stroke') {
-      const { d, filled } = strokeGeometry(item);
-      const st = strokeStyle(item);
-      ctx.save();
-      ctx.scale(OUT_W / PAGE_W, OUT_H / PAGE_H);
-      ctx.globalAlpha = st.opacity;
-      const path = new Path2D(d);
-      if (filled) {
-        ctx.fillStyle = item.color;
-        ctx.fill(path);
-      } else {
-        ctx.strokeStyle = item.color;
-        ctx.lineWidth = st.width;
-        ctx.lineCap = st.cap;
-        ctx.lineJoin = 'round';
-        ctx.stroke(path);
-      }
-      ctx.restore();
+      drawStroke(ctx, item, scratch);
     } else if (item.type === 'sticker') {
       const sticker = STICKERS.find((s) => s.id === item.sticker);
       if (!sticker) continue;

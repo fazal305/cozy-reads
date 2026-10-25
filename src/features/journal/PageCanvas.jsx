@@ -1,11 +1,11 @@
-import { useState, forwardRef } from 'react';
+import { useState, useId, forwardRef, memo } from 'react';
 import { STICKERS } from '../../data/stickers';
 import PageBackground from './PageBackground';
 import { WashiSvg, ShapeSvg } from './decor';
-import { strokeGeometry, strokeStyle } from './ink';
+import { strokeGeometry, strokeStyle, grainTile, GRAIN_TILE } from './ink';
 import { PAGE_W, PAGE_H } from './templates';
 import ElementBody from './ElementBody';
-import { imageValue, boxStyle, textStyle } from './layout';
+import { imageValue, boxStyle, textStyle, pageLayers } from './layout';
 import { useCoverSrc } from '../../lib/coverUrls';
 
 function PageImage({ item }) {
@@ -44,18 +44,38 @@ function TextBox({ item, editing, onTextChange, onTextBlur }) {
   );
 }
 
+// Strokes never change once saved, so each path only re-renders when its item is replaced.
+const StrokePath = memo(function StrokePath({ stroke, paint }) {
+  const { d, filled } = strokeGeometry(stroke);
+  const st = strokeStyle(stroke);
+  return filled ? (
+    <path d={d} fill={paint || stroke.color} opacity={st.opacity} />
+  ) : (
+    <path d={d} fill="none" stroke={stroke.color} strokeWidth={st.width} strokeLinecap={st.cap} strokeLinejoin="round" opacity={st.opacity} />
+  );
+});
+
+// Pencil grain: each pencil colour gets a small tile with the grain mask applied once, and the tile is repeated.
 function StrokeGroup({ strokes }) {
+  const id = useId().replace(/:/g, '');
+  const colours = [...new Set(strokes.filter((s) => s.tool === 'pencil').map((s) => s.color))];
   return (
     <svg viewBox={`0 0 ${PAGE_W} ${PAGE_H}`} preserveAspectRatio="none" aria-hidden="true" className="absolute inset-0 w-full h-full pointer-events-none">
-      {strokes.map((s) => {
-        const { d, filled } = strokeGeometry(s);
-        const st = strokeStyle(s);
-        return filled ? (
-          <path key={s.id} d={d} fill={s.color} opacity={st.opacity} />
-        ) : (
-          <path key={s.id} d={d} fill="none" stroke={s.color} strokeWidth={st.width} strokeLinecap={st.cap} strokeLinejoin="round" opacity={st.opacity} />
-        );
-      })}
+      {colours.length > 0 && (
+        <defs>
+          <mask id={`${id}m`} maskUnits="userSpaceOnUse" x="0" y="0" width={GRAIN_TILE} height={GRAIN_TILE}>
+            <image href={grainTile().url} width={GRAIN_TILE} height={GRAIN_TILE} />
+          </mask>
+          {colours.map((c, i) => (
+            <pattern key={c} id={`${id}p${i}`} patternUnits="userSpaceOnUse" width={GRAIN_TILE} height={GRAIN_TILE}>
+              <rect width={GRAIN_TILE} height={GRAIN_TILE} fill={c} mask={`url(#${id}m)`} />
+            </pattern>
+          ))}
+        </defs>
+      )}
+      {strokes.map((s) => (
+        <StrokePath key={s.id} stroke={s} paint={s.tool === 'pencil' ? `url(#${id}p${colours.indexOf(s.color)})` : null} />
+      ))}
     </svg>
   );
 }
@@ -82,21 +102,7 @@ const PageCanvas = forwardRef(function PageCanvas(
   { page, bgRef, interactive = false, editingId, selectedId, onItemPointerDown, onItemDoubleClick, onTextChange, onTextBlur, onItemChange, className = '', style, children, ...rest },
   ref,
 ) {
-  const items = page.items || [];
-  const layers = [];
-  let group = null;
-  for (const item of items) {
-    if (item.type === 'stroke') {
-      if (!group) {
-        group = [];
-        layers.push({ key: `ink-${item.id}`, strokes: group });
-      }
-      group.push(item);
-    } else {
-      group = null;
-      layers.push({ key: item.id, item });
-    }
-  }
+  const layers = pageLayers(page.items || []);
 
   return (
     <div

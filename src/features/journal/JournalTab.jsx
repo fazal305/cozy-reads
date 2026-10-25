@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { useEntries } from '../../hooks/useEntries';
 import { today } from '../../lib/bookMeta';
 import { card, input, primaryButton, softButton } from '../../lib/ui';
@@ -151,13 +151,18 @@ function CoverDialog({ settings, onSave, onClose }) {
   );
 }
 
+// Re-renders only when the saved page data changes, never while the editor is drawing.
+const Thumbnail = memo(function Thumbnail({ data }) {
+  return <PageCanvas page={{ template: data.template, paper: data.paper, paperColor: data.paperColor, items: data.items || [] }} />;
+});
+
 function PageCard({ entry, index, total, bookTitle, onOpen, onMove, onDetails, onDuplicate, onDelete }) {
   const title = entry.data.title || 'Untitled page';
   const iconButton = `${softButton} !px-2 !py-1`;
   return (
     <li className="min-w-0 flex flex-col">
       <button type="button" onClick={onOpen} aria-label={`Open ${title}`} className="block rounded-lg shadow-md ring-1 ring-black/10 dark:ring-white/10 overflow-hidden hover:-translate-y-0.5 hover:shadow-lg transition">
-        <PageCanvas page={{ template: entry.data.template, paper: entry.data.paper, paperColor: entry.data.paperColor, items: entry.data.items || [] }} />
+        <Thumbnail data={entry.data} />
       </button>
       <div className="mt-2 min-w-0">
         <p className="text-sm font-medium text-cozy-text truncate">{title}</p>

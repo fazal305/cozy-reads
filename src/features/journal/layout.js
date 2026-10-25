@@ -36,3 +36,26 @@ export function textStyle(item) {
     overflowWrap: 'anywhere',
   };
 }
+
+// Highlighters sit on the paper, under ink and everything else.
+export function pageLayers(items) {
+  const marks = [];
+  const layers = [];
+  let group = null;
+  for (const item of items) {
+    if (item.type === 'stroke' && item.tool === 'highlighter') {
+      marks.push(item);
+    } else if (item.type === 'stroke') {
+      if (!group) {
+        group = [];
+        layers.push({ key: `ink-${item.id}`, strokes: group });
+      }
+      group.push(item);
+    } else {
+      group = null;
+      layers.push({ key: item.id, item });
+    }
+  }
+  if (marks.length) layers.unshift({ key: 'highlights', strokes: marks });
+  return layers;
+}
