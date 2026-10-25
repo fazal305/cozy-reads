@@ -50,7 +50,8 @@ export const DECOR_COLORS = ['#f4b5b5', '#f6d68c', '#a8d5ba', '#a7c7e7', '#cdb4d
 // Widths are fractions of the page width.
 export const PEN_SIZES = [0.003, 0.005, 0.009];
 export const HIGHLIGHTER_SIZES = [0.016, 0.026, 0.038];
-export const ERASER_SIZES = [0.016, 0.032, 0.06];
+export const BRUSH_SIZES = [0.006, 0.011, 0.018];
+export const ERASER_RANGE = [0.008, 0.1];
 
 export const FONTS = [
   { id: 'hand', label: 'Handwritten', css: '"Caveat", "Segoe Print", cursive' },
