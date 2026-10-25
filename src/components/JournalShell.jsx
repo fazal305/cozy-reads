@@ -10,11 +10,13 @@ import BookshelfTab from '../features/bookshelf/BookshelfTab';
 import TrackersTab from '../features/trackers/TrackersTab';
 import ChallengesTab from '../features/challenges/ChallengesTab';
 import ExtrasTab from '../features/extras/ExtrasTab';
+import JournalTab from '../features/journal/JournalTab';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 const TABS = [
   { id: 'home', label: 'Home', short: 'Home', icon: '🏡' },
+  { id: 'journal', label: 'Journal', short: 'Journal', icon: '📓' },
   { id: 'tbr', label: 'TBR', short: 'TBR', icon: '📌' },
   { id: 'bookshelf', label: 'Bookshelf', short: 'Shelf', icon: '📚' },
   { id: 'trackers', label: 'Trackers', short: 'Trackers', icon: '📊' },
@@ -91,6 +93,7 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
 
       <main className="max-w-3xl mx-auto px-4 pt-6 pb-28 sm:py-8">
         {tab === 'home' && <HomeTab {...tabProps} goalApi={goalApi} onSelectTab={selectTab} />}
+        {tab === 'journal' && <JournalTab {...tabProps} />}
         {tab === 'tbr' && <TbrTab {...tabProps} />}
         {tab === 'bookshelf' && <BookshelfTab {...tabProps} />}
         {tab === 'trackers' && <TrackersTab {...tabProps} />}
@@ -107,7 +110,7 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
         aria-label="Journal sections"
         className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-cozy-card/95 backdrop-blur border-t border-cozy-border pb-[env(safe-area-inset-bottom)]"
       >
-        <ul className="grid grid-cols-7">
+        <ul className="grid grid-cols-8">
           {TABS.map((t) => (
             <li key={t.id}>
               <a

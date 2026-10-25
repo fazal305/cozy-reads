@@ -6,6 +6,7 @@ import { currentMonth } from '../lib/bookMeta';
 import { TRACKERS_SEED_ENTRIES } from '../features/trackers/demoSeed';
 import { CHALLENGES_SEED_ENTRIES } from '../features/challenges/demoSeed';
 import { EXTRAS_SEED_ENTRIES } from '../features/extras/demoSeed';
+import { JOURNAL_SEED_ENTRIES } from '../features/journal/demoSeed';
 
 export const DEMO_USER = { id: 'demo-user', email: 'reader@example.test' };
 
@@ -54,7 +55,7 @@ const BOOK_DEFAULTS = {
   extra: {},
 };
 
-const SEED_ENTRIES = [...TRACKERS_SEED_ENTRIES, ...CHALLENGES_SEED_ENTRIES, ...EXTRAS_SEED_ENTRIES];
+const SEED_ENTRIES = [...TRACKERS_SEED_ENTRIES, ...CHALLENGES_SEED_ENTRIES, ...EXTRAS_SEED_ENTRIES, ...JOURNAL_SEED_ENTRIES];
 
 let counter = 0;
 const newId = () => `mock-${Date.now().toString(36)}-${(counter++).toString(36)}`;
