@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import BookCover from '../../components/BookCover';
-import { STATUSES, FORMATS, spineColor, moodEmoji, statusLabel } from '../../lib/bookMeta';
+import { STATUSES, FORMATS, spineStyle, moodEmoji, statusLabel } from '../../lib/bookMeta';
 import { card, input, primaryButton, pill } from '../../lib/ui';
 
 const RATING_FILTERS = [
@@ -27,7 +27,7 @@ function Spine({ book, onOpen }) {
         onClick={() => onOpen(book)}
         title={`${book.title}${book.author ? ` by ${book.author}` : ''}`}
         aria-label={`Open ${book.title}`}
-        style={{ height, width, backgroundColor: spineColor(book) }}
+        style={{ height, width, ...spineStyle(book) }}
         className="relative rounded-t-sm shadow-[inset_-3px_0_0_rgba(0,0,0,0.18),inset_2px_0_0_rgba(255,255,255,0.15)] hover:-translate-y-2 transition flex items-center justify-center overflow-hidden"
       >
         <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-semibold text-white/95 tracking-wide truncate max-h-[85%] px-0.5">

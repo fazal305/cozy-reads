@@ -74,9 +74,50 @@ function hash(text) {
   return Math.abs(h);
 }
 
+export const SPINE_SWATCHES = [
+  { color: '#9A5B66', label: 'Rosewood' },
+  { color: '#A9606F', label: 'Blush' },
+  { color: '#B5524F', label: 'Brick' },
+  { color: '#9A553A', label: 'Terracotta' },
+  { color: '#8F6F1F', label: 'Mustard' },
+  { color: '#8A6A3B', label: 'Ochre' },
+  { color: '#5B7B60', label: 'Sage' },
+  { color: '#4F7A63', label: 'Fern' },
+  { color: '#3F6E73', label: 'Teal' },
+  { color: '#44739B', label: 'Sky' },
+  { color: '#355070', label: 'Navy' },
+  { color: '#5E6B8C', label: 'Slate' },
+  { color: '#75639F', label: 'Lilac' },
+  { color: '#6D597A', label: 'Plum' },
+  { color: '#7E4E6E', label: 'Mulberry' },
+  { color: '#3D3A40', label: 'Charcoal' },
+];
+
+export const SPINE_STYLES = [
+  { key: 'plain', label: 'Plain' },
+  { key: 'stripes', label: 'Stripes' },
+  { key: 'dots', label: 'Dots' },
+  { key: 'gold', label: 'Gold band' },
+];
+
+const SPINE_PATTERNS = {
+  stripes: { backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 4px, transparent 4px 9px)' },
+  dots: { backgroundImage: 'radial-gradient(rgba(255,255,255,0.28) 1.3px, transparent 1.8px)', backgroundSize: '7px 7px' },
+  gold: {
+    backgroundImage:
+      'linear-gradient(to bottom, transparent 9%, #D4AF5A 9% 12%, transparent 12% 15%, #D4AF5A 15% 16%, transparent 16% 84%, #D4AF5A 84% 85%, transparent 85% 88%, #D4AF5A 88% 91%, transparent 91%)',
+  },
+};
+
 export function spineColor(book) {
+  const custom = book.extra?.spine_color;
+  if (typeof custom === 'string' && /^#[0-9a-f]{6}$/i.test(custom)) return custom;
   const genre = (book.genre || '').trim().toLowerCase();
   return GENRE_COLORS[genre] || SPINE_COLORS[hash(genre || book.title || '') % SPINE_COLORS.length];
+}
+
+export function spineStyle(book) {
+  return { backgroundColor: spineColor(book), ...SPINE_PATTERNS[book.extra?.spine_style] };
 }
 
 export function moodEmoji(key) {
