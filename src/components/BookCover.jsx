@@ -1,8 +1,11 @@
+import { useCoverSrc } from '../lib/coverUrls';
+
 export default function BookCover({ book, className = '' }) {
+  const src = useCoverSrc(book.cover_url);
   return (
     <div className={`relative overflow-hidden rounded-xl bg-cozy-bg border border-cozy-primary/40 shadow-sm ${className}`}>
-      {book.cover_url ? (
-        <img src={book.cover_url} alt={book.title} className="w-full h-full object-cover" loading="lazy" />
+      {src ? (
+        <img src={src} alt={book.title} className="w-full h-full object-cover" loading="lazy" />
       ) : (
         <div className="w-full h-full flex flex-col items-center justify-center gap-1 p-2 text-center bg-gradient-to-br from-cozy-bg via-cozy-paper to-cozy-primary">
           <span className="text-xl" aria-hidden="true">📖</span>

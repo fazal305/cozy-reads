@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { COVER_PREFIX } from './coverUrls';
 
 // Storage adapter used by useBooks/useEntries. src/dev/mockApi.js provides
 // an in-memory adapter with the same shape for the dev preview.
@@ -30,8 +31,8 @@ export const supabaseBackend = {
         // Bucket missing or blocked: keep the cover inline instead
         return { data: await fileToDataUrl(file), error: null };
       }
-      const { data } = supabase.storage.from('covers').getPublicUrl(path);
-      return { data: data?.publicUrl || null, error: null };
+      // The bucket is private: store the path and sign it when shown
+      return { data: `${COVER_PREFIX}${path}`, error: null };
     },
   },
   entries: {

@@ -214,3 +214,27 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.user_books
 DROP TRIGGER IF EXISTS set_updated_at ON public.journal_entries;
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.journal_entries
     FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+-- =============================================================
+-- Release 4: Private book covers
+-- Covers are served through short-lived signed URLs, so the bucket is
+-- private and each user can only read or delete files in their own folder.
+-- Safe to re-run.
+-- =============================================================
+
+UPDATE storage.buckets SET public = false WHERE id = 'covers';
+
+DROP POLICY IF EXISTS "owner_covers_read" ON storage.objects;
+CREATE POLICY "owner_covers_read" ON storage.objects
+    FOR SELECT TO authenticated
+    USING (bucket_id = 'covers' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+DROP POLICY IF EXISTS "owner_covers_delete" ON storage.objects;
+CREATE POLICY "owner_covers_delete" ON storage.objects
+    FOR DELETE TO authenticated
+    USING (bucket_id = 'covers' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Old rows stored the public URL. Keep just the path ('covers:<path>').
+UPDATE public.user_books
+SET cover_url = regexp_replace(cover_url, '^https?://[^/]+/storage/v1/object/public/covers/', 'covers:')
+WHERE cover_url ~ '^https?://[^/]+/storage/v1/object/public/covers/';
