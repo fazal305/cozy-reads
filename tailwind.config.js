@@ -23,7 +23,7 @@ export default {
       keyframes: {
         'fade-in': {
           from: { opacity: '0', transform: 'translateY(8px)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+          to: { opacity: '1', transform: 'none' },
         },
         'heart-pop': {
           '0%': { transform: 'scale(0) translateY(0)', opacity: '1' },

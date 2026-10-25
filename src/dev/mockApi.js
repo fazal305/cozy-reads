@@ -3,6 +3,9 @@
 // and useBooks()/useEntries(kind) return exactly what they return against Supabase.
 import { useState, useCallback } from 'react';
 import { currentMonth } from '../lib/bookMeta';
+import { TRACKERS_SEED_ENTRIES } from '../features/trackers/demoSeed';
+import { CHALLENGES_SEED_ENTRIES } from '../features/challenges/demoSeed';
+import { EXTRAS_SEED_ENTRIES } from '../features/extras/demoSeed';
 
 export const DEMO_USER = { id: 'demo-user', email: 'reader@example.test' };
 
@@ -51,10 +54,7 @@ const BOOK_DEFAULTS = {
   extra: {},
 };
 
-const SEED_ENTRIES = [
-  { kind: 'trackers.reading_log', entry_date: `${year}-10-20`, data: { pages: 42 } },
-  { kind: 'trackers.reading_log', entry_date: `${year}-10-21`, data: { pages: 30 } },
-];
+const SEED_ENTRIES = [...TRACKERS_SEED_ENTRIES, ...CHALLENGES_SEED_ENTRIES, ...EXTRAS_SEED_ENTRIES];
 
 let counter = 0;
 const newId = () => `mock-${Date.now().toString(36)}-${(counter++).toString(36)}`;
