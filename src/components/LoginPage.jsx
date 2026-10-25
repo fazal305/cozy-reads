@@ -76,7 +76,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white border border-cozy-primary shadow-sm mb-3">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cozy-paper border border-cozy-primary shadow-sm mb-3">
             <img src="/favicon.svg" alt="" aria-hidden="true" className="w-8 h-8" />
           </div>
           <h1 className="font-serif text-3xl text-cozy-text tracking-wide">Cozy Reads</h1>
@@ -93,7 +93,7 @@ export default function LoginPage() {
               onClick={() => handleModeSwitch(false)}
               className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition ${
                 !isSignUp
-                  ? 'bg-white text-cozy-text shadow-sm'
+                  ? 'bg-cozy-paper text-cozy-text shadow-sm'
                   : 'text-cozy-muted hover:text-cozy-text'
               }`}
             >
@@ -104,7 +104,7 @@ export default function LoginPage() {
               onClick={() => handleModeSwitch(true)}
               className={`flex-1 py-1.5 text-xs font-medium rounded-lg transition ${
                 isSignUp
-                  ? 'bg-white text-cozy-text shadow-sm'
+                  ? 'bg-cozy-paper text-cozy-text shadow-sm'
                   : 'text-cozy-muted hover:text-cozy-text'
               }`}
             >
@@ -164,13 +164,13 @@ export default function LoginPage() {
             )}
 
             {error && (
-              <p role="alert" className="text-xs text-cozy-accent bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <p role="alert" className="text-xs text-cozy-accent bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
 
             {message && (
-              <p role="status" className="text-xs text-[#2e6b48] bg-[#edf7f0] border border-[#c4e6ce] rounded-lg px-3 py-2">
+              <p role="status" className="text-xs text-[#2e6b48] bg-[#edf7f0] border border-[#c4e6ce] dark:text-green-200 dark:bg-green-950/40 dark:border-green-900 rounded-lg px-3 py-2">
                 {message}
               </p>
             )}

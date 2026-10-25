@@ -1,29 +1,4 @@
-const TROPES = [
-  // Romance
-  'Enemies to Lovers',
-  'Slow Burn',
-  'Fake Dating',
-  'Forced Proximity',
-  'Second Chance',
-  'Love Triangle',
-  'Friends to Lovers',
-  'Forbidden Love',
-  'Grumpy / Sunshine',
-  'Roommates',
-  'Sports Romance',
-  'Age Gap',
-  // Fantasy / SFF
-  'Chosen One',
-  'Portal Fantasy',
-  'Reluctant Hero',
-  'Found Family',
-  'Enemies to Allies',
-  'Magic Academy',
-  'Prophecy',
-  'Dark Academia',
-  'Antihero',
-  'Fae Courts',
-];
+import { TROPES } from '../data/tropes';
 
 export default function TropeMatrix({ selected, onChange }) {
   const toggle = (trope) => {

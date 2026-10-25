@@ -117,3 +117,100 @@ DROP POLICY IF EXISTS "authenticated_covers_insert" ON storage.objects;
 CREATE POLICY "authenticated_covers_insert" ON storage.objects
     FOR INSERT TO authenticated
     WITH CHECK (bucket_id = 'covers' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- =============================================================
+-- Release 3: Tabbed journal (TBR, bookshelf, full reviews)
+-- Safe to re-run.
+-- =============================================================
+
+ALTER TABLE public.user_books
+    ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'read'
+        CHECK (status IN ('tbr', 'reading', 'read', 'dnf', 'wishlist')),
+    ADD COLUMN IF NOT EXISTS genre TEXT,
+    ADD COLUMN IF NOT EXISTS pages INTEGER CHECK (pages IS NULL OR pages > 0),
+    ADD COLUMN IF NOT EXISTS format TEXT
+        CHECK (format IN ('owned', 'gifted', 'borrowed', 'library', 'ebook', 'audiobook', 'arc')),
+    ADD COLUMN IF NOT EXISTS start_date DATE,
+    ADD COLUMN IF NOT EXISTS finish_date DATE,
+    ADD COLUMN IF NOT EXISTS spice INTEGER CHECK (spice >= 0 AND spice <= 5),
+    ADD COLUMN IF NOT EXISTS mood TEXT,
+    ADD COLUMN IF NOT EXISTS review TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS review_done BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN IF NOT EXISTS favorite BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN IF NOT EXISTS tropes TEXT[] NOT NULL DEFAULT '{}',
+    ADD COLUMN IF NOT EXISTS series_name TEXT,
+    ADD COLUMN IF NOT EXISTS series_number NUMERIC,
+    ADD COLUMN IF NOT EXISTS season TEXT
+        CHECK (season IN ('spring', 'summer', 'autumn', 'winter')),
+    ADD COLUMN IF NOT EXISTS dnf_reason TEXT,
+    ADD COLUMN IF NOT EXISTS dnf_progress TEXT,
+    ADD COLUMN IF NOT EXISTS extra JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+-- TBR and wishlist books have no rating yet. The 1-5 check still applies.
+ALTER TABLE public.user_books ALTER COLUMN rating DROP DEFAULT;
+ALTER TABLE public.user_books ALTER COLUMN rating DROP NOT NULL;
+
+CREATE INDEX IF NOT EXISTS user_books_user_status_idx
+    ON public.user_books (user_id, status);
+
+-- Generic per-user journal records. `kind` is namespaced by feature,
+-- e.g. 'trackers.reading_log', 'extras.book_club', 'challenges.bingo'.
+CREATE TABLE IF NOT EXISTS public.journal_entries (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL DEFAULT auth.uid(),
+    kind TEXT NOT NULL,
+    entry_date DATE,
+    data JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS journal_entries_user_kind_idx
+    ON public.journal_entries (user_id, kind);
+
+ALTER TABLE public.journal_entries ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "journal_entries_select" ON public.journal_entries;
+CREATE POLICY "journal_entries_select" ON public.journal_entries
+    FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "journal_entries_insert" ON public.journal_entries;
+CREATE POLICY "journal_entries_insert" ON public.journal_entries
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "journal_entries_update" ON public.journal_entries;
+CREATE POLICY "journal_entries_update" ON public.journal_entries
+    FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "journal_entries_delete" ON public.journal_entries;
+CREATE POLICY "journal_entries_delete" ON public.journal_entries
+    FOR DELETE USING (auth.uid() = user_id);
+
+-- Keep the update policy on reading_goals consistent with the others.
+DROP POLICY IF EXISTS "private_update" ON public.reading_goals;
+CREATE POLICY "private_update" ON public.reading_goals
+    FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- Shared updated_at helper
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+    NEW.updated_at = timezone('utc'::text, now());
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS set_updated_at ON public.reading_goals;
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.reading_goals
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+DROP TRIGGER IF EXISTS set_updated_at ON public.user_books;
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.user_books
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+DROP TRIGGER IF EXISTS set_updated_at ON public.journal_entries;
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.journal_entries
+    FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();

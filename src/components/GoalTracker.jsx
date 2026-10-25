@@ -84,7 +84,7 @@ export default function GoalTracker({ goal, onLogBook, onUpdateChallenge }) {
       </div>
 
       {logError && (
-        <p role="alert" className="text-sm text-cozy-accent text-center mt-3 bg-red-50 border border-red-100 rounded-lg px-4 py-2">
+        <p role="alert" className="text-sm text-cozy-accent text-center mt-3 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-4 py-2">
           {logError}
         </p>
       )}
