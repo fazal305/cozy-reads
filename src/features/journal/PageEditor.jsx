@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { input, pill, primaryButton, softButton } from '../../lib/ui';
+import { useJournal } from '../../lib/journalContext';
 import { Modal } from '../challenges/shared';
 import PageCanvas from './PageCanvas';
 import PageBackground from './PageBackground';
@@ -9,6 +10,7 @@ import { addPoint, endPoint, eraseAlong, eraseAt, finishStroke, strokeGeometry, 
 import { decorItem, duplicateItem, imageItem, pageDoc, textItem } from './items';
 import { boxStyle, isHttpsUrl, textStyle } from './layout';
 import { exportPagePng } from './exportPng';
+import { preparePhoto, PhotoError } from './photo';
 import {
   PAGE_RATIO, PAPERS, TEMPLATES, INK_COLORS, HIGHLIGHT_COLORS, DECOR_COLORS, PEN_SIZES, HIGHLIGHTER_SIZES, ERASER_SIZES,
   FONTS, TEXT_SIZES, WASHI_STYLES, getPaper, newItemId, round,
@@ -103,6 +105,7 @@ function SizeDots({ sizes, value, onChange, label }) {
 const Divider = () => <span aria-hidden="true" className="w-px h-7 bg-cozy-border shrink-0" />;
 
 export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
+  const { userId, backend } = useJournal();
   const [initial] = useState(() => pageDoc(entry.data));
   const { doc, canUndo, canRedo, change, undo, redo } = useHistory(initial);
   const paper = getPaper(doc.paper);
@@ -120,6 +123,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   const [modal, setModal] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [imageError, setImageError] = useState('');
+  const [photo, setPhoto] = useState({ busy: false, label: '', error: '' });
   const [ghost, setGhost] = useState(null);
   const [toast, setToast] = useState('');
   const [exporting, setExporting] = useState(false);
@@ -143,6 +147,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   const queuedRef = useRef(null);
   const keyRef = useRef(null);
   const toastTimer = useRef(null);
+  const fileRef = useRef(null);
 
   const items = doc.items;
   const selected = items.find((i) => i.id === selectedId) || null;
@@ -511,6 +516,22 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
     img.src = url;
   };
 
+  const uploadPhoto = async (file) => {
+    if (!file) return;
+    setPhoto({ busy: true, label: 'Getting your photo ready…', error: '' });
+    try {
+      const prepared = await preparePhoto(file);
+      setPhoto({ busy: true, label: 'Uploading…', error: '' });
+      const { data, error } = await backend.journal.uploadPhoto(userId, prepared.blob, prepared.ext);
+      if (error || !data) throw new PhotoError(typeof error === 'string' ? error : 'The photo could not be uploaded. Try again.');
+      addItem(imageItem(data, prepared.aspect));
+      setModal(null);
+      setPhoto({ busy: false, label: '', error: '' });
+    } catch (err) {
+      setPhoto({ busy: false, label: '', error: err instanceof PhotoError ? err.message : 'Something went wrong with that photo. Try another one.' });
+    }
+  };
+
   const exportPng = async () => {
     setExporting(true);
     try {
@@ -609,7 +630,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
       </>
     );
   } else if (selected) {
-    const typeLabel = { sticker: 'Sticker', image: 'Image', text: 'Text', washi: 'Tape', shape: 'Shape', stroke: 'Ink' }[selected.type];
+    const typeLabel = { sticker: 'Sticker', image: 'Photo', text: 'Text', washi: 'Tape', shape: 'Shape', stroke: 'Ink' }[selected.type];
     contextBar = (
       <>
         <span className="text-xs font-semibold text-cozy-muted shrink-0">{typeLabel}</span>
@@ -752,7 +773,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
           </div>
           <ToolButton label="Stickers" icon="🌸" active={drawerOpen} onClick={() => setDrawerOpen((o) => !o)} />
           <ToolButton label="Text" icon="🔤" onClick={() => addItem(textItem(paper.ink), true)} />
-          <ToolButton label="Image" icon="🖼️" onClick={() => setModal('image')} />
+          <ToolButton label="Photo" icon="🖼️" onClick={() => setModal('image')} />
           <ToolButton label="Paper" icon="📄" onClick={() => setModal('paper')} />
         </nav>
       </div>
@@ -775,14 +796,40 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
     <>
       {createPortal(editor, document.body)}
       {modal === 'image' && (
-        <Modal title="Add an image" labelId="journal-image-title" onClose={() => setModal(null)}>
-          <form onSubmit={addImage} className="space-y-3">
-            <label htmlFor="journal-image-url" className="block text-xs font-medium text-cozy-text">Image link</label>
-            <input id="journal-image-url" type="url" inputMode="url" className={input} placeholder="https://…" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-            {imageError && <p role="alert" className="text-xs text-cozy-accent-ink">{imageError}</p>}
-            <p className="text-xs text-cozy-muted">Paste a link to an image that starts with https://. Photo uploads are coming later.</p>
-            <button type="submit" className={primaryButton}>Add image</button>
-          </form>
+        <Modal title="Add a photo" labelId="journal-image-title" onClose={() => !photo.busy && setModal(null)}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <input
+                ref={fileRef}
+                id="journal-photo-file"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                tabIndex={-1}
+                onChange={(e) => {
+                  uploadPhoto(e.target.files?.[0]);
+                  e.target.value = '';
+                }}
+              />
+              <button type="button" disabled={photo.busy} onClick={() => fileRef.current?.click()} className={`${primaryButton} inline-flex items-center gap-2`}>
+                📷 Choose a photo
+              </button>
+              {photo.busy && (
+                <p role="status" className="flex items-center gap-2 text-xs text-cozy-text">
+                  <span aria-hidden="true" className="w-4 h-4 rounded-full border-2 border-cozy-primary border-t-cozy-accent animate-spin" />
+                  {photo.label}
+                </p>
+              )}
+              {photo.error && <p role="alert" className="text-xs text-cozy-accent-ink">{photo.error}</p>}
+              <p className="text-xs text-cozy-muted">Photos are made smaller, and any location details are removed, before they are saved. Up to 15 MB.</p>
+            </div>
+            <form onSubmit={addImage} className="space-y-3 border-t border-cozy-border pt-4">
+              <label htmlFor="journal-image-url" className="block text-xs font-medium text-cozy-text">Or use an image link</label>
+              <input id="journal-image-url" type="url" inputMode="url" className={input} placeholder="https://…" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+              {imageError && <p role="alert" className="text-xs text-cozy-accent-ink">{imageError}</p>}
+              <button type="submit" disabled={photo.busy} className={primaryButton}>Add image</button>
+            </form>
+          </div>
         </Modal>
       )}
       {modal === 'paper' && (

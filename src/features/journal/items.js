@@ -32,9 +32,10 @@ export function textItem(color, cx = 0.5, cy = 0.45) {
   return centred({ id: newItemId(), type: 'text', text: '', font: 'hand', size: 0.045, color, w: 0.5, h: 0.06 }, cx, cy);
 }
 
-export function imageItem(url, aspect, cx = 0.5, cy = 0.45) {
+export function imageItem(source, aspect, cx = 0.5, cy = 0.45) {
   const w = 0.5;
-  return centred({ id: newItemId(), type: 'image', url, w, h: (w * ASPECT) / (aspect || 1) }, cx, cy);
+  const ref = source.startsWith('https:') ? { url: source } : { src: source };
+  return centred({ id: newItemId(), type: 'image', ...ref, w, h: (w * ASPECT) / (aspect || 1) }, cx, cy);
 }
 
 export function duplicateItem(item) {

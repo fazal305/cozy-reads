@@ -4,18 +4,22 @@ import PageBackground from './PageBackground';
 import { WashiSvg, ShapeSvg } from './decor';
 import { strokeGeometry, strokeStyle } from './ink';
 import { PAGE_W, PAGE_H } from './templates';
-import { isHttpsUrl, boxStyle, textStyle } from './layout';
+import { imageValue, boxStyle, textStyle } from './layout';
+import { useCoverSrc } from '../../lib/coverUrls';
 
 function PageImage({ item }) {
-  const [failed, setFailed] = useState(false);
-  if (failed || !isHttpsUrl(item.url)) {
+  const value = imageValue(item);
+  const src = useCoverSrc(value);
+  const [failedSrc, setFailedSrc] = useState(null);
+  if (!value || (src && failedSrc === src)) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-black/5 border border-dashed border-black/20 text-[10px] text-center text-black/50 p-1">
         Image could not load
       </div>
     );
   }
-  return <img src={item.url} alt="" draggable={false} referrerPolicy="no-referrer" onError={() => setFailed(true)} className="w-full h-full object-cover block select-none" />;
+  if (!src) return <div role="img" aria-label="Loading photo" className="w-full h-full bg-black/10 animate-pulse" />;
+  return <img src={src} alt="" draggable={false} referrerPolicy="no-referrer" onError={() => setFailedSrc(src)} className="w-full h-full object-cover block select-none" />;
 }
 
 function TextBox({ item, editing, onTextChange, onTextBlur }) {

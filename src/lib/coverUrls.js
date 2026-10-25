@@ -64,6 +64,13 @@ function signCover(path) {
   return inflight.get(path);
 }
 
+// Same as useCoverSrc, for code outside React (PNG export).
+export async function resolveCoverSrc(value) {
+  const path = coverPath(value);
+  if (!path) return value || '';
+  return cachedUrl(path) || (await signCover(path));
+}
+
 export function useCoverSrc(value) {
   const path = coverPath(value);
   const [signed, setSigned] = useState({ path: null, url: null });

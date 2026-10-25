@@ -8,6 +8,12 @@ export function isHttpsUrl(value) {
   }
 }
 
+// Photos keep a bucket path in `src`; older images hold an https link in `url`.
+export function imageValue(item) {
+  if (item.src) return /^(covers:|data:image\/|https:)/.test(item.src) ? item.src : '';
+  return isHttpsUrl(item.url) ? item.url : '';
+}
+
 export function boxStyle(item) {
   return {
     left: `${item.x * 100}%`,

@@ -35,6 +35,14 @@ export const supabaseBackend = {
       return { data: `${COVER_PREFIX}${path}`, error: null };
     },
   },
+  journal: {
+    uploadPhoto: async (userId, blob, ext) => {
+      const path = `${userId}/journal/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from('covers').upload(path, blob, { contentType: blob.type, cacheControl: '31536000' });
+      if (error) return { data: null, error: 'The photo could not be uploaded. Check your connection and try again.' };
+      return { data: `${COVER_PREFIX}${path}`, error: null };
+    },
+  },
   entries: {
     list: (userId, kind) =>
       supabase

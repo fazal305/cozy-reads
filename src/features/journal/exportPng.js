@@ -1,7 +1,8 @@
 import { STICKERS } from '../../data/stickers';
 import { strokeGeometry, strokeStyle } from './ink';
-import { isHttpsUrl } from './layout';
+import { imageValue } from './layout';
 import { PAGE_W, PAGE_H, PAGE_RATIO, fontCss } from './templates';
+import { resolveCoverSrc } from '../../lib/coverUrls';
 
 const OUT_W = 1240;
 const OUT_H = Math.round(OUT_W * PAGE_RATIO);
@@ -115,9 +116,10 @@ export async function exportPagePng({ page, root, background, filename }) {
         skipped++;
       }
     } else if (item.type === 'image') {
-      if (!isHttpsUrl(item.url)) continue;
+      const value = imageValue(item);
+      if (!value) continue;
       try {
-        const img = await loadImage(item.url, true);
+        const img = await loadImage(await resolveCoverSrc(value), true);
         inBox(ctx, item, null, (x, y, w, h) => {
           ctx.save();
           ctx.beginPath();

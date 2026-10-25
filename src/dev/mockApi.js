@@ -107,6 +107,14 @@ export function createMockBackend({ userId = DEMO_USER.id, delay = 120, seed = t
         return { data, error: null };
       },
     },
+    journal: {
+      uploadPhoto: (_uid, blob) =>
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => setTimeout(() => resolve({ data: reader.result, error: null }), delay * 4);
+          reader.readAsDataURL(blob);
+        }),
+    },
     entries: {
       list: (uid, kind) =>
         ok(
