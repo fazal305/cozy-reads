@@ -4,6 +4,7 @@ import { useHashTab } from '../hooks/useHashTab';
 import { useTheme } from '../hooks/useTheme';
 import BookEditor from './BookEditor';
 import StickerVault from './StickerVault';
+import ThemePicker from './ThemePicker';
 import HomeTab from '../features/home/HomeTab';
 import TbrTab from '../features/tbr/TbrTab';
 import BookshelfTab from '../features/bookshelf/BookshelfTab';
@@ -29,14 +30,13 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
   const booksApi = useBooks();
   const { books } = booksApi;
   const [tab, selectTab] = useHashTab(TAB_IDS, 'home');
-  const { theme, toggleTheme } = useTheme();
+  const themeApi = useTheme();
   const [editor, setEditor] = useState(null);
 
   const openEditor = useCallback((book, defaults) => setEditor({ book: book || null, defaults }), []);
   const closeEditor = useCallback(() => setEditor(null), []);
 
   const tabProps = { userId: user.id, books, booksApi, openEditor };
-  const isDark = theme === 'dark';
 
   return (
     <div className="min-h-screen bg-cozy-bg">
@@ -47,16 +47,7 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
             <span className="font-serif text-lg text-cozy-text">Cozy Reads</span>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-pressed={isDark}
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={isDark ? 'Light mode' : 'Dark mode'}
-              className="w-9 h-9 rounded-full border border-cozy-primary bg-cozy-bg text-base flex items-center justify-center hover:border-cozy-accent transition"
-            >
-              <span aria-hidden="true">{isDark ? '☀️' : '🌙'}</span>
-            </button>
+            <ThemePicker {...themeApi} />
             <button onClick={onSignOut} className="text-sm text-cozy-muted hover:text-cozy-accent transition">
               Sign out
             </button>

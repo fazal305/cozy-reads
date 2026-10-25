@@ -1,17 +1,24 @@
 import { useState, useCallback } from 'react';
-import { getInitialTheme, applyTheme, saveTheme } from '../lib/theme';
+import { getInitialTheme, getInitialPalette, applyTheme, saveTheme, savePalette, isDarkOnly } from '../lib/theme';
 
 export function useTheme() {
-  const [theme, setTheme] = useState(getInitialTheme);
+  const [state, setState] = useState(() => ({ theme: getInitialTheme(), palette: getInitialPalette() }));
+  const isDark = state.theme === 'dark' || isDarkOnly(state.palette);
 
-  const toggleTheme = useCallback(() => {
-    setTheme((current) => {
-      const next = current === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      saveTheme(next);
-      return next;
-    });
+  const update = useCallback((next) => {
+    applyTheme(next.theme, next.palette);
+    saveTheme(next.theme);
+    savePalette(next.palette);
+    setState(next);
   }, []);
 
-  return { theme, toggleTheme };
+  // Leaving a dark-only palette for light mode falls back to the default palette.
+  const toggleTheme = useCallback(() => {
+    if (isDark) update({ theme: 'light', palette: isDarkOnly(state.palette) ? 'rose' : state.palette });
+    else update({ theme: 'dark', palette: state.palette });
+  }, [isDark, state.palette, update]);
+
+  const setPalette = useCallback((palette) => update({ theme: state.theme, palette }), [state.theme, update]);
+
+  return { theme: isDark ? 'dark' : 'light', toggleTheme, palette: state.palette, setPalette };
 }

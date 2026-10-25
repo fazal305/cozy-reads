@@ -10,7 +10,7 @@
     --cozy-primary: 244 181 181;
     --cozy-accent: 232 138 138;
     --cozy-text: 74 53 53;
-    --cozy-muted: 155 114 114;
+    --cozy-muted: 138 98 98;
     --cozy-border: 244 181 181;
     color-scheme: light;
   }
@@ -24,6 +24,118 @@
     --cozy-text: 243 228 222;
     --cozy-muted: 199 169 163;
     --cozy-border: 74 53 51;
+    color-scheme: dark;
+  }
+
+  :root[data-palette='sage'] {
+    --cozy-bg: 243 247 240;
+    --cozy-card: 255 255 255;
+    --cozy-paper: 251 253 249;
+    --cozy-primary: 184 207 183;
+    --cozy-accent: 84 117 89;
+    --cozy-text: 45 60 47;
+    --cozy-muted: 88 108 90;
+    --cozy-border: 196 215 194;
+  }
+
+  :root.dark[data-palette='sage'] {
+    --cozy-bg: 22 28 23;
+    --cozy-card: 31 39 32;
+    --cozy-paper: 40 50 41;
+    --cozy-primary: 63 84 66;
+    --cozy-accent: 107 151 112;
+    --cozy-text: 228 238 226;
+    --cozy-muted: 168 189 168;
+    --cozy-border: 52 68 54;
+  }
+
+  :root[data-palette='lavender'] {
+    --cozy-bg: 247 244 252;
+    --cozy-card: 255 255 255;
+    --cozy-paper: 253 252 255;
+    --cozy-primary: 206 194 234;
+    --cozy-accent: 122 94 166;
+    --cozy-text: 58 46 79;
+    --cozy-muted: 104 89 130;
+    --cozy-border: 216 205 240;
+  }
+
+  :root.dark[data-palette='lavender'] {
+    --cozy-bg: 26 22 36;
+    --cozy-card: 36 31 50;
+    --cozy-paper: 46 40 63;
+    --cozy-primary: 76 64 105;
+    --cozy-accent: 156 129 206;
+    --cozy-text: 236 230 248;
+    --cozy-muted: 186 174 210;
+    --cozy-border: 60 52 84;
+  }
+
+  :root[data-palette='ocean'] {
+    --cozy-bg: 241 246 250;
+    --cozy-card: 255 255 255;
+    --cozy-paper: 250 252 254;
+    --cozy-primary: 179 203 224;
+    --cozy-accent: 70 108 144;
+    --cozy-text: 37 52 69;
+    --cozy-muted: 82 102 123;
+    --cozy-border: 192 212 230;
+  }
+
+  :root.dark[data-palette='ocean'] {
+    --cozy-bg: 19 26 34;
+    --cozy-card: 27 36 47;
+    --cozy-paper: 36 47 60;
+    --cozy-primary: 55 75 98;
+    --cozy-accent: 101 148 191;
+    --cozy-text: 226 235 244;
+    --cozy-muted: 160 181 202;
+    --cozy-border: 46 62 80;
+  }
+
+  :root[data-palette='mocha'] {
+    --cozy-bg: 248 242 236;
+    --cozy-card: 255 252 248;
+    --cozy-paper: 255 255 255;
+    --cozy-primary: 221 196 174;
+    --cozy-accent: 139 94 66;
+    --cozy-text: 64 44 32;
+    --cozy-muted: 112 86 69;
+    --cozy-border: 226 206 188;
+  }
+
+  :root.dark[data-palette='mocha'] {
+    --cozy-bg: 30 23 19;
+    --cozy-card: 41 32 27;
+    --cozy-paper: 52 41 35;
+    --cozy-primary: 92 70 56;
+    --cozy-accent: 184 131 92;
+    --cozy-text: 241 230 220;
+    --cozy-muted: 196 174 156;
+    --cozy-border: 72 56 46;
+  }
+
+  :root[data-palette='midnight'] {
+    --cozy-bg: 14 18 33;
+    --cozy-card: 22 28 48;
+    --cozy-paper: 30 37 62;
+    --cozy-primary: 52 62 99;
+    --cozy-accent: 112 128 214;
+    --cozy-text: 232 235 245;
+    --cozy-muted: 167 175 201;
+    --cozy-border: 42 51 82;
+    color-scheme: dark;
+  }
+
+  :root[data-palette='blush'] {
+    --cozy-bg: 34 20 28;
+    --cozy-card: 45 27 37;
+    --cozy-paper: 56 35 47;
+    --cozy-primary: 102 58 82;
+    --cozy-accent: 213 110 158;
+    --cozy-text: 246 230 238;
+    --cozy-muted: 212 177 194;
+    --cozy-border: 82 48 66;
     color-scheme: dark;
   }
 
