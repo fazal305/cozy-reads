@@ -1,6 +1,8 @@
 import GoalTracker from './GoalTracker';
 import TropeMatrix from './TropeMatrix';
 import AssetDownloads from './AssetDownloads';
+import LibraryGrid from './LibraryGrid';
+import StickerVault from './StickerVault';
 import { useReadingGoal } from '../hooks/useReadingGoal';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -73,6 +75,8 @@ export default function Dashboard({ user, onSignOut }) {
               selected={goal.favorite_tropes ?? []}
               onChange={updateTropes}
             />
+            <LibraryGrid userId={user.id} />
+            <StickerVault />
             <AssetDownloads />
           </>
         )}

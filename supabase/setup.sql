@@ -20,12 +20,15 @@ CREATE TABLE IF NOT EXISTS public.reading_goals (
 -- 2. Row Level Security — every user sees only their own rows
 ALTER TABLE public.reading_goals ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "private_select" ON public.reading_goals;
 CREATE POLICY "private_select" ON public.reading_goals
     FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "private_insert" ON public.reading_goals;
 CREATE POLICY "private_insert" ON public.reading_goals
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "private_update" ON public.reading_goals;
 CREATE POLICY "private_update" ON public.reading_goals
     FOR UPDATE USING (auth.uid() = user_id);
 
@@ -67,3 +70,50 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 -- This means only signed-in users can request signed URLs.
 -- The anon key alone cannot access the files.
 -- =============================================================
+
+-- =============================================================
+-- Release 2: Visual Bookshelf & Scrapbook Diary
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS public.user_books (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    title TEXT NOT NULL,
+    author TEXT DEFAULT '',
+    cover_url TEXT DEFAULT '',
+    rating INTEGER CHECK (rating >= 1 AND rating <= 5) DEFAULT 5,
+    summary TEXT DEFAULT '',
+    quotes JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.user_books ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "user_books_select" ON public.user_books;
+CREATE POLICY "user_books_select" ON public.user_books
+    FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "user_books_insert" ON public.user_books;
+CREATE POLICY "user_books_insert" ON public.user_books
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "user_books_update" ON public.user_books;
+CREATE POLICY "user_books_update" ON public.user_books
+    FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "user_books_delete" ON public.user_books;
+CREATE POLICY "user_books_delete" ON public.user_books
+    FOR DELETE USING (auth.uid() = user_id);
+
+-- Book covers: public bucket so covers load by URL. No SELECT policy, so
+-- files can't be listed; users may only upload into their own folder.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('covers', 'covers', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "public_covers_read" ON storage.objects;
+DROP POLICY IF EXISTS "authenticated_covers_insert" ON storage.objects;
+CREATE POLICY "authenticated_covers_insert" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (bucket_id = 'covers' AND (storage.foldername(name))[1] = auth.uid()::text);
