@@ -4,11 +4,14 @@ import { pill } from '../../lib/ui';
 import { WashiSvg, ShapeSvg } from './decor';
 import { DECOR_COLORS, WASHI_STYLES, SHAPES } from './templates';
 import { decorItem } from './items';
+import { ELEMENTS } from './elements';
+import ElementBody from './ElementBody';
 
 const TABS = [
   { id: 'stickers', label: 'Stickers' },
-  { id: 'tape', label: 'Washi tape' },
+  { id: 'tape', label: 'Tape' },
   { id: 'shapes', label: 'Shapes' },
+  { id: 'elements', label: 'Elements' },
 ];
 
 function categoryLabel(id) {
@@ -20,7 +23,17 @@ export function DecorPreview({ payload }) {
     const sticker = STICKERS.find((s) => s.id === payload.sticker);
     return sticker ? <img src={sticker.src} alt="" draggable={false} className="w-full h-full object-contain" /> : null;
   }
-  const item = decorItem(payload, 0.5, 0.5);
+  const item = decorItem(payload.kind === 'element' ? { ...payload, color: 'rgb(var(--cozy-text))' } : payload, 0.5, 0.5);
+  if (payload.kind === 'element') {
+    const ratio = item.h / item.w;
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="w-full" style={{ aspectRatio: `${1 / (ratio * 1414 / 1000)}` }}>
+          <ElementBody item={item} />
+        </div>
+      </div>
+    );
+  }
   const ratio = (item.h * 1414) / (item.w * 1000);
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -31,7 +44,7 @@ export function DecorPreview({ payload }) {
   );
 }
 
-export default function StickerDrawer({ onPick, onDragStart, onClose }) {
+export default function StickerDrawer({ onPick, onDragStart, onClose, ink }) {
   const [tab, setTab] = useState('stickers');
   const [category, setCategory] = useState('all');
   const [color, setColor] = useState(DECOR_COLORS[0]);
@@ -42,6 +55,8 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
     options = STICKERS.filter((s) => category === 'all' || s.category === category).map((s) => ({ key: s.id, label: s.name, payload: { kind: 'sticker', sticker: s.id } }));
   } else if (tab === 'tape') {
     options = WASHI_STYLES.map((w) => ({ key: w.id, label: w.label, payload: { kind: 'washi', style: w.id, color } }));
+  } else if (tab === 'elements') {
+    options = ELEMENTS.map((el) => ({ key: el.id, label: el.label, payload: { kind: 'element', element: el.id, color: ink } }));
   } else {
     options = SHAPES.map((s) => ({ key: s.id, label: s.label, payload: { kind: 'shape', shape: s.id, color } }));
   }
@@ -80,7 +95,7 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
             </button>
           ))}
         </div>
-      ) : (
+      ) : tab === 'elements' ? null : (
         <div className="flex shrink-0 gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide" aria-label="Colour">
           {DECOR_COLORS.map((c) => (
             <button
@@ -96,7 +111,7 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
         </div>
       )}
       <p className="shrink-0 px-4 pb-1 text-[11px] text-cozy-muted">Drag onto the page, or tap to add it in the middle.</p>
-      <ul className="grid grid-cols-4 sm:grid-cols-3 gap-2 px-4 pb-4 pt-1 overflow-y-auto overscroll-contain">
+      <ul className={`grid ${tab === 'elements' ? 'grid-cols-3 sm:grid-cols-2' : 'grid-cols-4 sm:grid-cols-3'} gap-2 px-4 pb-4 pt-1 overflow-y-auto overscroll-contain`}>
         {options.map((o) => (
           <li key={o.key}>
             <button

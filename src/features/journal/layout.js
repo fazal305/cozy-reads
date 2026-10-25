@@ -16,6 +16,7 @@ export function imageValue(item) {
 
 export function boxStyle(item) {
   return {
+    opacity: item.op != null && item.op < 1 ? item.op : undefined,
     left: `${item.x * 100}%`,
     top: `${item.y * 100}%`,
     width: `${item.w * 100}%`,

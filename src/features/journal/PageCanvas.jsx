@@ -4,6 +4,7 @@ import PageBackground from './PageBackground';
 import { WashiSvg, ShapeSvg } from './decor';
 import { strokeGeometry, strokeStyle } from './ink';
 import { PAGE_W, PAGE_H } from './templates';
+import ElementBody from './ElementBody';
 import { imageValue, boxStyle, textStyle } from './layout';
 import { useCoverSrc } from '../../lib/coverUrls';
 
@@ -59,7 +60,7 @@ function StrokeGroup({ strokes }) {
   );
 }
 
-export function ItemBody({ item, editing, onTextChange, onTextBlur }) {
+export function ItemBody({ item, editing, active, onTextChange, onTextBlur, onItemChange }) {
   if (item.type === 'sticker') {
     const sticker = STICKERS.find((s) => s.id === item.sticker);
     return sticker ? (
@@ -71,13 +72,14 @@ export function ItemBody({ item, editing, onTextChange, onTextBlur }) {
   if (item.type === 'image') return <PageImage item={item} />;
   if (item.type === 'washi') return <WashiSvg item={item} exportId={item.id} />;
   if (item.type === 'shape') return <ShapeSvg item={item} exportId={item.id} />;
+  if (item.type === 'element') return <ElementBody item={item} active={active} onChange={onItemChange ? (patch, gid) => onItemChange(item.id, patch, gid) : undefined} />;
   if (item.type === 'text') return <TextBox item={item} editing={editing} onTextChange={onTextChange} onTextBlur={onTextBlur} />;
   return null;
 }
 
 // Renders a page. Without handlers it is a read-only view (used for thumbnails).
 const PageCanvas = forwardRef(function PageCanvas(
-  { page, bgRef, interactive = false, editingId, onItemPointerDown, onItemDoubleClick, onTextChange, onTextBlur, className = '', style, children, ...rest },
+  { page, bgRef, interactive = false, editingId, selectedId, onItemPointerDown, onItemDoubleClick, onTextChange, onTextBlur, onItemChange, className = '', style, children, ...rest },
   ref,
 ) {
   const items = page.items || [];
@@ -116,7 +118,7 @@ const PageCanvas = forwardRef(function PageCanvas(
             onPointerDown={interactive ? (e) => onItemPointerDown(e, layer.item) : undefined}
             onDoubleClick={interactive && onItemDoubleClick ? () => onItemDoubleClick(layer.item) : undefined}
           >
-            <ItemBody item={layer.item} editing={editingId === layer.item.id} onTextChange={onTextChange} onTextBlur={onTextBlur} />
+            <ItemBody item={layer.item} editing={editingId === layer.item.id} active={interactive && selectedId === layer.item.id} onTextChange={onTextChange} onTextBlur={onTextBlur} onItemChange={interactive ? onItemChange : undefined} />
           </div>
         ),
       )}

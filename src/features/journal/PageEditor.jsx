@@ -7,14 +7,17 @@ import PageCanvas from './PageCanvas';
 import PageBackground from './PageBackground';
 import StickerDrawer, { DecorPreview } from './StickerDrawer';
 import { addPoint, endPoint, eraseAlong, eraseAt, finishStroke, strokeGeometry, strokeStyle } from './ink';
-import { decorItem, duplicateItem, imageItem, pageDoc, textItem } from './items';
+import { cascadeSpot, decorItem, duplicateItem, imageItem, pageDoc, textItem } from './items';
 import { boxStyle, isHttpsUrl, textStyle } from './layout';
 import { exportPagePng } from './exportPng';
 import { preparePhoto, PhotoError } from './photo';
+import { resizeCells, withHeight, CHECK, TABLE } from './elements';
 import {
   PAGE_RATIO, PAPERS, TEMPLATES, INK_COLORS, HIGHLIGHT_COLORS, DECOR_COLORS, PEN_SIZES, HIGHLIGHTER_SIZES, ERASER_SIZES,
-  FONTS, TEXT_SIZES, WASHI_STYLES, getPaper, newItemId, round,
+  FONTS, TEXT_SIZES, WASHI_STYLES, getPaper, newItemId, round, shapeCanFill, shapeHasRadius,
 } from './templates';
+
+const ELEMENT_COLORS = ['#e3a82b', '#d9483b', '#e88a8a', '#4f7a63', '#355070', '#6d597a'];
 
 const HISTORY_LIMIT = 100;
 
@@ -79,6 +82,26 @@ function Swatches({ colors, value, onChange, label }) {
           style={{ background: c }}
         />
       ))}
+    </div>
+  );
+}
+
+function Range({ label, min, max, value, onChange }) {
+  return (
+    <label className="flex items-center gap-1.5 text-xs font-medium text-cozy-text shrink-0">
+      <span>{label}</span>
+      <input type="range" min={min} max={max} value={value} onChange={(e) => onChange(Number(e.target.value))} className="w-20 accent-cozy-accent" />
+    </label>
+  );
+}
+
+function Stepper({ label, value, min, max, onChange }) {
+  return (
+    <div role="group" aria-label={label} className="flex items-center gap-1 shrink-0 text-xs font-medium text-cozy-text">
+      <span>{label}</span>
+      <button type="button" aria-label={`Fewer ${label.toLowerCase()}`} disabled={value <= min} onClick={() => onChange(value - 1)} className={`${softButton} !px-2.5`}>−</button>
+      <span aria-live="polite" className="w-4 text-center tabular-nums">{value}</span>
+      <button type="button" aria-label={`More ${label.toLowerCase()}`} disabled={value >= max} onClick={() => onChange(value + 1)} className={`${softButton} !px-2.5`}>+</button>
     </div>
   );
 }
@@ -148,6 +171,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   const keyRef = useRef(null);
   const toastTimer = useRef(null);
   const fileRef = useRef(null);
+  const placedRef = useRef(0);
 
   const items = doc.items;
   const selected = items.find((i) => i.id === selectedId) || null;
@@ -463,7 +487,11 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   };
 
   // --- drawer: tap to place in the middle, drag (mouse / pen) to drop -------
-  const placePayload = (payload, x = 0.5, y = 0.45) => addItem(decorItem(payload, x, y));
+  const nextSpot = () => cascadeSpot(placedRef.current++);
+  const placePayload = (payload, at) => {
+    const spot = at || nextSpot();
+    addItem(decorItem(payload, spot.x, spot.y));
+  };
 
   const dragState = useRef(null);
   const onDrawerDragStart = (e, payload) => {
@@ -485,7 +513,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
         dragState.current.suppressClick = true;
         const rect = pageRef.current.getBoundingClientRect();
         const p = pagePoint(ev.clientX, ev.clientY, rect);
-        if (p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1) placePayload(payload, p.x, p.y);
+        if (p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1) placePayload(payload, p);
       },
     );
   };
@@ -507,13 +535,19 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
     const img = new Image();
     img.referrerPolicy = 'no-referrer';
     img.onload = () => {
-      addItem(imageItem(url, img.naturalWidth / img.naturalHeight));
+      const spot = nextSpot();
+      addItem(imageItem(url, img.naturalWidth / img.naturalHeight, spot.x, spot.y));
       setModal(null);
       setImageUrl('');
       setImageError('');
     };
     img.onerror = () => setImageError('That image could not be loaded. Check the link and try again.');
     img.src = url;
+  };
+
+  const addText = () => {
+    const spot = nextSpot();
+    addItem(textItem(paper.ink, spot.x, spot.y), true);
   };
 
   const uploadPhoto = async (file) => {
@@ -524,7 +558,8 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
       setPhoto({ busy: true, label: 'Uploading…', error: '' });
       const { data, error } = await backend.journal.uploadPhoto(userId, prepared.blob, prepared.ext);
       if (error || !data) throw new PhotoError(typeof error === 'string' ? error : 'The photo could not be uploaded. Try again.');
-      addItem(imageItem(data, prepared.aspect));
+      const spot = nextSpot();
+      addItem(imageItem(data, prepared.aspect, spot.x, spot.y));
       setModal(null);
       setPhoto({ busy: false, label: '', error: '' });
     } catch (err) {
@@ -594,6 +629,8 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   const status = saveError ? 'Not saved' : saving || doc !== saved ? 'Saving…' : 'Saved';
   const drawing = mode === 'draw';
 
+  const setColor = (c) => updateItem(selected.id, { color: c }, `color-${selected.id}`);
+
   // --- context bar ----------------------------------------------------------
   let contextBar;
   if (drawing) {
@@ -630,7 +667,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
       </>
     );
   } else if (selected) {
-    const typeLabel = { sticker: 'Sticker', image: 'Photo', text: 'Text', washi: 'Tape', shape: 'Shape', stroke: 'Ink' }[selected.type];
+    const typeLabel = { sticker: 'Sticker', image: 'Photo', text: 'Text', washi: 'Tape', shape: 'Shape', stroke: 'Ink', element: 'Element' }[selected.type];
     contextBar = (
       <>
         <span className="text-xs font-semibold text-cozy-muted shrink-0">{typeLabel}</span>
@@ -655,7 +692,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
                 </button>
               ))}
             </div>
-            <Swatches label="Text colour" colors={[...new Set([paper.ink, ...INK_COLORS])]} value={selected.color} onChange={(c) => updateItem(selected.id, { color: c })} />
+            <Swatches label="Text colour" colors={[...new Set([paper.ink, ...INK_COLORS])]} value={selected.color} onChange={setColor} />
           </>
         )}
         {selected.type === 'washi' && (
@@ -667,8 +704,59 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
             </select>
           </>
         )}
+        {selected.type === 'shape' && (
+          <>
+            <Divider />
+            {shapeCanFill(selected.shape) && (
+              <div role="group" aria-label="Fill style" className="flex gap-1 shrink-0">
+                {[['Filled', true], ['Outline', false]].map(([text, on]) => (
+                  <button key={text} type="button" aria-pressed={!!selected.filled === on} onClick={() => updateItem(selected.id, { filled: on })} className={pill(!!selected.filled === on)}>
+                    {text}
+                  </button>
+                ))}
+              </div>
+            )}
+            <Range label="Line" min={2} max={24} value={selected.sw ?? 6} onChange={(v) => updateItem(selected.id, { sw: v }, `sw-${selected.id}`)} />
+            {shapeHasRadius(selected.shape) && (
+              <Range label="Corners" min={0} max={80} value={selected.rad ?? (selected.shape === 'double' ? 6 : 10)} onChange={(v) => updateItem(selected.id, { rad: v }, `rad-${selected.id}`)} />
+            )}
+          </>
+        )}
         {(selected.type === 'washi' || selected.type === 'shape') && (
-          <Swatches label="Colour" colors={DECOR_COLORS} value={selected.color} onChange={(c) => updateItem(selected.id, { color: c })} />
+          <Swatches label="Colour" colors={DECOR_COLORS} value={selected.color} onChange={setColor} />
+        )}
+        {selected.type === 'element' && (
+          <>
+            <Divider />
+            {selected.kind === 'checklist' && (
+              <Stepper
+                label="Rows"
+                value={selected.items.length}
+                min={1}
+                max={CHECK.maxRows}
+                onChange={(n) => {
+                  const items = n > selected.items.length ? [...selected.items, { t: '', done: false }] : selected.items.slice(0, n);
+                  updateItem(selected.id, withHeight(selected, { items }));
+                }}
+              />
+            )}
+            {selected.kind === 'table' && (
+              <>
+                <Stepper label="Rows" value={selected.rows} min={1} max={TABLE.max} onChange={(n) => updateItem(selected.id, withHeight(selected, { rows: n, cells: resizeCells(selected.cells, n, selected.cols) }))} />
+                <Stepper label="Columns" value={selected.cols} min={1} max={TABLE.max} onChange={(n) => updateItem(selected.id, { cols: n, cells: resizeCells(selected.cells, selected.rows, n) })} />
+              </>
+            )}
+            {(selected.kind === 'checklist' || selected.kind === 'table' || selected.kind === 'quote') && (
+              <div role="group" aria-label="Font" className="flex gap-1 shrink-0">
+                {FONTS.map((f) => (
+                  <button key={f.id} type="button" aria-pressed={selected.font === f.id} onClick={() => updateItem(selected.id, { font: f.id })} className={pill(selected.font === f.id)} style={{ fontFamily: f.css }}>
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <Swatches label="Colour" colors={[...new Set([paper.ink, ...ELEMENT_COLORS])]} value={selected.color} onChange={setColor} />
+          </>
         )}
       </>
     );
@@ -704,6 +792,8 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
                 page={doc}
                 interactive={!drawing}
                 editingId={editingId}
+                selectedId={selectedId}
+                onItemChange={updateItem}
                 onItemPointerDown={startMove}
                 onItemDoubleClick={(item) => item.type === 'text' && startEdit(item.id)}
                 onTextChange={(id, text) => updateItem(id, { text }, editGid.current)}
@@ -724,7 +814,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
                 <div ref={overlayRef} className="absolute pointer-events-none" style={{ ...boxStyle(selected), ...(selected.type === 'text' ? textStyle(selected) : null), color: 'transparent' }}>
                   {selected.type === 'text' && <div aria-hidden="true" className="invisible">{`${selected.text}​`}</div>}
                   <div
-                    className={`absolute inset-0 rounded-sm outline outline-2 outline-dashed outline-offset-2 outline-cozy-accent ${editingId === selected.id ? '' : 'pointer-events-auto cursor-move touch-none'}`}
+                    className={`absolute inset-0 rounded-sm outline outline-2 outline-dashed outline-offset-2 outline-cozy-accent ${editingId === selected.id || selected.type === 'element' ? '' : 'pointer-events-auto cursor-move touch-none'}`}
                     onPointerDown={(e) => startMove(e, selected)}
                     onDoubleClick={() => selected.type === 'text' && startEdit(selected.id)}
                   />
@@ -752,7 +842,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
             </div>
           </div>
         </div>
-        {drawerOpen && <StickerDrawer onPick={onDrawerPick} onDragStart={onDrawerDragStart} onClose={() => setDrawerOpen(false)} />}
+        {drawerOpen && <StickerDrawer ink={paper.ink} onPick={onDrawerPick} onDragStart={onDrawerDragStart} onClose={() => setDrawerOpen(false)} />}
       </div>
 
       <div className="border-t border-cozy-border bg-cozy-card pb-[env(safe-area-inset-bottom)]">
@@ -772,7 +862,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
             />
           </div>
           <ToolButton label="Stickers" icon="🌸" active={drawerOpen} onClick={() => setDrawerOpen((o) => !o)} />
-          <ToolButton label="Text" icon="🔤" onClick={() => addItem(textItem(paper.ink), true)} />
+          <ToolButton label="Text" icon="🔤" onClick={addText} />
           <ToolButton label="Photo" icon="🖼️" onClick={() => setModal('image')} />
           <ToolButton label="Paper" icon="📄" onClick={() => setModal('paper')} />
         </nav>

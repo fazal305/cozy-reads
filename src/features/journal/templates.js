@@ -81,4 +81,26 @@ export const SHAPES = [
   { id: 'heart', label: 'Heart' },
   { id: 'star', label: 'Star' },
   { id: 'ribbon', label: 'Ribbon banner' },
+  { id: 'rect', label: 'Rectangle' },
+  { id: 'rounded', label: 'Rounded box' },
+  { id: 'line', label: 'Line' },
+  { id: 'arrow', label: 'Arrow' },
+  { id: 'bubble', label: 'Speech bubble' },
+  { id: 'thought', label: 'Thought bubble' },
+  { id: 'cloud', label: 'Cloud' },
+  { id: 'flower', label: 'Flower' },
+  { id: 'sparkle', label: 'Sparkle' },
+  { id: 'bookmark', label: 'Bookmark' },
+  { id: 'tag', label: 'Label tag' },
+  { id: 'banner', label: 'Banner' },
+  { id: 'note', label: 'Sticky note' },
+  { id: 'dotted', label: 'Dotted divider' },
+  { id: 'wavy', label: 'Wavy divider' },
+  { id: 'dline', label: 'Double divider' },
 ];
+
+// Which controls a shape offers: a filled/outline switch and a corner radius.
+const OPEN_SHAPES = ['line', 'arrow', 'dotted', 'wavy', 'dline', 'ribbon'];
+const RADIUS_SHAPES = ['frame', 'double', 'rect', 'rounded', 'bubble'];
+export const shapeCanFill = (id) => !OPEN_SHAPES.includes(id);
+export const shapeHasRadius = (id) => RADIUS_SHAPES.includes(id);
