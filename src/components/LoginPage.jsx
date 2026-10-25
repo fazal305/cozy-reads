@@ -71,7 +71,13 @@ export default function LoginPage() {
             src="/login-hero.jpg"
             alt=""
             aria-hidden="true"
-            className="w-44 h-44 object-contain"
+            className="w-44 h-44 object-contain dark:hidden"
+          />
+          <img
+            src="/login-hero-dark.jpg"
+            alt=""
+            aria-hidden="true"
+            className="hidden w-44 h-44 object-contain dark:block"
           />
         </div>
 
