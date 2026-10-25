@@ -90,7 +90,9 @@ export function duplicateItem(item) {
 }
 
 export function pageDoc(data = {}) {
-  return { template: data.template || 'blank', paper: data.paper || 'cream', items: Array.isArray(data.items) ? data.items : [] };
+  const doc = { template: data.template || 'blank', paper: data.paper || 'cream', items: Array.isArray(data.items) ? data.items : [] };
+  if (data.paperColor) doc.paperColor = data.paperColor;
+  return doc;
 }
 
 // Tap-to-place spots drift down and right so new items do not stack exactly.

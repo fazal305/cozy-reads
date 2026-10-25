@@ -6,6 +6,7 @@ import { DECOR_COLORS, WASHI_STYLES, SHAPES } from './templates';
 import { decorItem } from './items';
 import { ELEMENTS } from './elements';
 import ElementBody from './ElementBody';
+import { ColorSwatches } from '../../components/ColorPicker';
 
 const TABS = [
   { id: 'stickers', label: 'Stickers' },
@@ -96,18 +97,8 @@ export default function StickerDrawer({ onPick, onDragStart, onClose, ink }) {
           ))}
         </div>
       ) : tab === 'elements' ? null : (
-        <div className="flex shrink-0 gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide" aria-label="Colour">
-          {DECOR_COLORS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              aria-label={`Colour ${c}`}
-              aria-pressed={color === c}
-              onClick={() => setColor(c)}
-              className={`w-7 h-7 shrink-0 rounded-full border-2 ${color === c ? 'border-cozy-accent scale-110' : 'border-cozy-border'}`}
-              style={{ background: c }}
-            />
-          ))}
+        <div className="flex shrink-0 gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide">
+          <ColorSwatches label="Colour" colors={DECOR_COLORS} value={color} onChange={setColor} />
         </div>
       )}
       <p className="shrink-0 px-4 pb-1 text-[11px] text-cozy-muted">Drag onto the page, or tap to add it in the middle.</p>

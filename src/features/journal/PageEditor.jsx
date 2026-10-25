@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react
 import { createPortal } from 'react-dom';
 import { input, pill, primaryButton, softButton } from '../../lib/ui';
 import { useJournal } from '../../lib/journalContext';
+import { ColorSwatches } from '../../components/ColorPicker';
 import { Modal } from '../challenges/shared';
 import PageCanvas from './PageCanvas';
 import PageBackground from './PageBackground';
@@ -68,24 +69,6 @@ function ToolButton({ label, icon, active, onClick, disabled, className = '' }) 
   );
 }
 
-function Swatches({ colors, value, onChange, label }) {
-  return (
-    <div role="group" aria-label={label} className="flex items-center gap-1.5 shrink-0">
-      {colors.map((c) => (
-        <button
-          key={c}
-          type="button"
-          aria-label={`${label} ${c}`}
-          aria-pressed={value === c}
-          onClick={() => onChange(c)}
-          className={`w-7 h-7 shrink-0 rounded-full border-2 transition ${value === c ? 'border-cozy-accent scale-110' : 'border-cozy-border'}`}
-          style={{ background: c }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function Range({ label, min, max, value, onChange }) {
   return (
     <label className="flex items-center gap-1.5 text-xs font-medium text-cozy-text shrink-0">
@@ -131,7 +114,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   const { userId, backend } = useJournal();
   const [initial] = useState(() => pageDoc(entry.data));
   const { doc, canUndo, canRedo, change, undo, redo } = useHistory(initial);
-  const paper = getPaper(doc.paper);
+  const paper = getPaper(doc.paper, doc.paperColor);
 
   const [mode, setMode] = useState('select');
   const [tool, setTool] = useState('pen');
@@ -630,6 +613,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   const drawing = mode === 'draw';
 
   const setColor = (c) => updateItem(selected.id, { color: c }, `color-${selected.id}`);
+  const setOpacity = (v) => updateItem(selected.id, { op: v }, `op-${selected.id}`);
 
   // --- context bar ----------------------------------------------------------
   let contextBar;
@@ -651,14 +635,14 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
         <Divider />
         {tool === 'pen' && (
           <>
-            <Swatches label="Pen colour" colors={[...new Set([paper.ink, ...INK_COLORS])]} value={penColor} onChange={setPenColor} />
+            <ColorSwatches label="Pen colour" colors={[...new Set([paper.ink, ...INK_COLORS])]} value={penColor} onChange={setPenColor} />
             <Divider />
             <SizeDots label="Pen width" sizes={PEN_SIZES} value={penSize} onChange={setPenSize} />
           </>
         )}
         {tool === 'highlighter' && (
           <>
-            <Swatches label="Highlighter colour" colors={HIGHLIGHT_COLORS} value={hlColor} onChange={setHlColor} />
+            <ColorSwatches label="Highlighter colour" colors={HIGHLIGHT_COLORS} value={hlColor} onChange={setHlColor} />
             <Divider />
             <SizeDots label="Highlighter width" sizes={HIGHLIGHTER_SIZES} value={hlSize} onChange={setHlSize} />
           </>
@@ -692,7 +676,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
                 </button>
               ))}
             </div>
-            <Swatches label="Text colour" colors={[...new Set([paper.ink, ...INK_COLORS])]} value={selected.color} onChange={setColor} />
+            <ColorSwatches label="Text colour" colors={[...new Set([paper.ink, ...INK_COLORS])]} value={selected.color} onChange={setColor} />
           </>
         )}
         {selected.type === 'washi' && (
@@ -723,7 +707,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
           </>
         )}
         {(selected.type === 'washi' || selected.type === 'shape') && (
-          <Swatches label="Colour" colors={DECOR_COLORS} value={selected.color} onChange={setColor} />
+          <ColorSwatches label="Colour" colors={DECOR_COLORS} value={selected.color} onChange={setColor} opacity={selected.op ?? 1} onOpacity={setOpacity} />
         )}
         {selected.type === 'element' && (
           <>
@@ -755,7 +739,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
                 ))}
               </div>
             )}
-            <Swatches label="Colour" colors={[...new Set([paper.ink, ...ELEMENT_COLORS])]} value={selected.color} onChange={setColor} />
+            <ColorSwatches label="Colour" colors={[...new Set([paper.ink, ...ELEMENT_COLORS])]} value={selected.color} onChange={setColor} opacity={selected.op ?? 1} onOpacity={setOpacity} />
           </>
         )}
       </>
@@ -927,8 +911,10 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
           <StylePicker
             template={doc.template}
             paper={doc.paper}
+            paperColor={doc.paperColor}
             onTemplate={(t) => change((d) => (d.template === t ? d : { ...d, template: t }))}
             onPaper={(p) => change((d) => (d.paper === p ? d : { ...d, paper: p }))}
+            onPaperColor={(c) => change((d) => (d.paper === 'custom' && d.paperColor === c ? d : { ...d, paper: 'custom', paperColor: c }), 'paper-colour')}
           />
         </Modal>
       )}
@@ -936,7 +922,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
   );
 }
 
-export function StylePicker({ template, paper, onTemplate, onPaper }) {
+export function StylePicker({ template, paper, paperColor, onTemplate, onPaper, onPaperColor }) {
   return (
     <div className="space-y-4">
       <fieldset>
@@ -945,7 +931,7 @@ export function StylePicker({ template, paper, onTemplate, onPaper }) {
           {TEMPLATES.map((t) => (
             <button key={t.id} type="button" aria-pressed={template === t.id} onClick={() => onTemplate(t.id)} className={`rounded-xl p-1.5 border-2 text-left transition ${template === t.id ? 'border-cozy-accent' : 'border-transparent hover:border-cozy-primary'}`}>
               <div className="relative w-full overflow-hidden rounded-md shadow-sm ring-1 ring-black/10" style={{ aspectRatio: '1000 / 1414' }}>
-                <PageBackground template={t.id} paper={paper} />
+                <PageBackground template={t.id} paper={paper} paperColor={paperColor} />
               </div>
               <span className="block mt-1 text-[11px] text-cozy-text leading-tight">{t.label}</span>
             </button>
@@ -967,6 +953,18 @@ export function StylePicker({ template, paper, onTemplate, onPaper }) {
               {p.label}
             </button>
           ))}
+          <span className="inline-flex items-center gap-1.5">
+            <button
+              type="button"
+              aria-pressed={paper === 'custom'}
+              onClick={() => onPaperColor(paperColor || '#fbf6ee')}
+              className={`flex items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border-2 text-xs text-cozy-text transition ${paper === 'custom' ? 'border-cozy-accent' : 'border-cozy-border hover:border-cozy-primary'}`}
+            >
+              <span aria-hidden="true" className="w-5 h-5 rounded-full ring-1 ring-black/15" style={{ background: paperColor || '#fbf6ee' }} />
+              Custom
+            </button>
+            <ColorSwatches label="Paper colour" colors={[]} value={paperColor || '#fbf6ee'} onChange={onPaperColor} />
+          </span>
         </div>
       </fieldset>
     </div>

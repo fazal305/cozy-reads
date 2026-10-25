@@ -1,3 +1,5 @@
+import { normHex, luminance, mixHex } from '../../lib/colorMath';
+
 // Page geometry: A5-like portrait. Items store coordinates normalised to the page (0..1).
 export const PAGE_W = 1000;
 export const PAGE_H = 1414;
@@ -26,7 +28,14 @@ export const PAPERS = [
   { id: 'cocoa', label: 'Cocoa', bg: '#2f2523', line: '#4b3b37', ink: '#f3e4de', accent: '#d97a7e' },
 ];
 
-export function getPaper(id) {
+// A custom paper is the preset id 'custom' plus a hex colour stored beside it.
+export function getPaper(id, color) {
+  if (id === 'custom' && normHex(color)) {
+    const bg = normHex(color);
+    const dark = luminance(bg) < 0.4;
+    const ink = dark ? '#f3ece6' : '#3b2f2f';
+    return { id: 'custom', label: 'Custom', bg, line: mixHex(bg, ink, 0.18), ink, accent: mixHex(bg, ink, dark ? 0.55 : 0.5) };
+  }
   return PAPERS.find((p) => p.id === id) || PAPERS[0];
 }
 

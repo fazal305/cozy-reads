@@ -105,7 +105,7 @@ const PageCanvas = forwardRef(function PageCanvas(
       style={{ aspectRatio: `${PAGE_W} / ${PAGE_H}`, containerType: 'inline-size', ...style }}
       {...rest}
     >
-      <PageBackground ref={bgRef} template={page.template} paper={page.paper} />
+      <PageBackground ref={bgRef} template={page.template} paper={page.paper} paperColor={page.paperColor} />
       {layers.map((layer) =>
         layer.strokes ? (
           <StrokeGroup key={layer.key} strokes={layer.strokes} />

@@ -166,9 +166,9 @@ function Ruling({ template, paper, pid }) {
   return null;
 }
 
-const PageBackground = forwardRef(function PageBackground({ template, paper: paperId }, ref) {
+const PageBackground = forwardRef(function PageBackground({ template, paper: paperId, paperColor }, ref) {
   const pid = `ruling-${useId().replace(/:/g, '')}`;
-  const paper = getPaper(paperId);
+  const paper = getPaper(paperId, paperColor);
   return (
     <svg
       ref={ref}

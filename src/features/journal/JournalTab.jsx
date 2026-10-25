@@ -29,6 +29,7 @@ function NewPageDialog({ books, onCreate, onClose }) {
   const dark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const [template, setTemplate] = useState('review');
   const [paper, setPaper] = useState(dark ? 'midnight' : 'cream');
+  const [paperColor, setPaperColor] = useState('');
   const [title, setTitle] = useState('');
   const [bookId, setBookId] = useState('');
   const [busy, setBusy] = useState(false);
@@ -38,7 +39,7 @@ function NewPageDialog({ books, onCreate, onClose }) {
     e.preventDefault();
     setBusy(true);
     const book = books.find((b) => b.id === bookId);
-    const result = await onCreate({ template, paper, title: title.trim() || (book ? book.title : getTemplate(template).label), book_id: bookId || null });
+    const result = await onCreate({ template, paper, paperColor: paper === 'custom' ? paperColor : undefined, title: title.trim() || (book ? book.title : getTemplate(template).label), book_id: bookId || null });
     setBusy(false);
     if (result?.error) setError(result.error);
   };
@@ -46,7 +47,7 @@ function NewPageDialog({ books, onCreate, onClose }) {
   return (
     <Modal title="New page" eyebrow="Journal" labelId="journal-new-title" onClose={onClose}>
       <form onSubmit={submit} className="space-y-4">
-        <StylePicker template={template} paper={paper} onTemplate={setTemplate} onPaper={setPaper} />
+        <StylePicker template={template} paper={paper} paperColor={paperColor} onTemplate={setTemplate} onPaper={setPaper} onPaperColor={(c) => { setPaperColor(c); setPaper('custom'); }} />
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="space-y-1 min-w-0">
             <label htmlFor="journal-new-name" className="block text-xs font-medium text-cozy-text">Page name</label>
@@ -156,7 +157,7 @@ function PageCard({ entry, index, total, bookTitle, onOpen, onMove, onDetails, o
   return (
     <li className="min-w-0 flex flex-col">
       <button type="button" onClick={onOpen} aria-label={`Open ${title}`} className="block rounded-lg shadow-md ring-1 ring-black/10 dark:ring-white/10 overflow-hidden hover:-translate-y-0.5 hover:shadow-lg transition">
-        <PageCanvas page={{ template: entry.data.template, paper: entry.data.paper, items: entry.data.items || [] }} />
+        <PageCanvas page={{ template: entry.data.template, paper: entry.data.paper, paperColor: entry.data.paperColor, items: entry.data.items || [] }} />
       </button>
       <div className="mt-2 min-w-0">
         <p className="text-sm font-medium text-cozy-text truncate">{title}</p>
@@ -203,9 +204,9 @@ export default function JournalTab({ books }) {
     return update(id, { data: { ...latest.data, ...patch } });
   };
 
-  const createPage = async ({ template, paper, title, book_id }) => {
+  const createPage = async ({ template, paper, paperColor, title, book_id }) => {
     const order = pages.reduce((max, p, i) => Math.max(max, orderOf(p, i)), -1) + 1;
-    const result = await add({ data: { title, template, paper, book_id, order, items: [] }, entry_date: today() });
+    const result = await add({ data: { title, template, paper, ...(paperColor ? { paperColor } : {}), book_id, order, items: [] }, entry_date: today() });
     if (!result.error) {
       setDialog(null);
       setOpenId(result.data.id);
