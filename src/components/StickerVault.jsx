@@ -1,22 +1,22 @@
 import { useState, useRef } from 'react';
-import { STICKERS } from '../data/stickers';
+import { STICKERS, STICKER_CATEGORIES } from '../data/stickers';
 
-const CATEGORIES = [
-  { id: 'all', label: 'All Stickers' },
-  { id: 'ratings', label: '★ Ratings & Badges' },
-  { id: 'tropes', label: '⚔️ Book Tropes' },
-  { id: 'cozy', label: '🌸 Cozy Doodles' },
-];
+const CATEGORIES = [{ id: 'all', label: 'All' }, ...STICKER_CATEGORIES];
+const CATEGORY_LABELS = Object.fromEntries(STICKER_CATEGORIES.map((c) => [c.id, c.label]));
 
 export default function StickerVault() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [query, setQuery] = useState('');
   const [copiedId, setCopiedId] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
   const toastTimer = useRef(null);
 
-  const filteredStickers = activeCategory === 'all'
-    ? STICKERS
-    : STICKERS.filter(s => s.category === activeCategory);
+  const q = query.trim().toLowerCase();
+  const filteredStickers = STICKERS.filter(
+    (s) =>
+      (activeCategory === 'all' || s.category === activeCategory) &&
+      (!q || `${s.name} ${CATEGORY_LABELS[s.category] || ''}`.toLowerCase().includes(q)),
+  );
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -68,13 +68,22 @@ export default function StickerVault() {
         </div>
       </div>
 
-      {/* Category Filter Pills */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <input
+        type="search"
+        aria-label="Search stickers"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search stickers…"
+        className="w-full mb-3 px-3 py-2 rounded-xl border border-cozy-primary/60 bg-cozy-paper text-cozy-text placeholder-cozy-muted text-sm focus:outline-none focus:ring-2 focus:ring-cozy-accent"
+      />
+
+      <div className="flex flex-wrap gap-2 mb-3" role="group" aria-label="Sticker categories">
         {CATEGORIES.map(cat => (
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition ${
+            aria-pressed={activeCategory === cat.id}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
               activeCategory === cat.id
                 ? 'bg-cozy-accent text-white shadow-sm'
                 : 'bg-cozy-bg text-cozy-text border border-cozy-primary hover:bg-cozy-paper'
@@ -85,14 +94,22 @@ export default function StickerVault() {
         ))}
       </div>
 
+      <p className="text-xs text-cozy-muted mb-4" aria-live="polite">
+        {filteredStickers.length} {filteredStickers.length === 1 ? 'sticker' : 'stickers'}
+      </p>
+
+      {filteredStickers.length === 0 && (
+        <p className="text-sm text-cozy-muted italic text-center py-10">No stickers match your search.</p>
+      )}
+
       {/* Sticker Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
         {filteredStickers.map(sticker => {
           const isCopied = copiedId === sticker.id;
           return (
             <div
               key={sticker.id}
-              className="group relative bg-cozy-bg border border-cozy-primary/40 rounded-2xl p-4 flex flex-col items-center justify-between text-center transition hover:shadow-md hover:scale-[1.02] bg-gradient-to-b from-cozy-paper to-cozy-bg"
+              className="group relative min-w-0 bg-cozy-bg border border-cozy-primary/40 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-between text-center transition hover:shadow-md hover:scale-[1.02] bg-gradient-to-b from-cozy-paper to-cozy-bg"
             >
               {/* Sticker Graphic */}
               <div
@@ -103,8 +120,11 @@ export default function StickerVault() {
                 <img
                   src={sticker.src}
                   alt={sticker.name}
-                  className="max-h-full max-w-full object-contain drop-shadow-sm select-none"
+                  width="512"
+                  height="512"
+                  className="w-full h-full object-contain drop-shadow-sm select-none"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
 
