@@ -218,7 +218,7 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-cozy-accent">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-cozy-accent-ink">
               {isNew ? 'New book' : 'Reading journal'}
             </span>
             <h3 id="editor-title" className="font-serif text-2xl text-cozy-text leading-tight">
@@ -234,7 +234,7 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
                   onClick={() => setMode(m)}
                   aria-pressed={mode === m}
                   className={`px-2.5 py-1 text-xs font-medium rounded-lg transition ${
-                    mode === m ? 'bg-cozy-accent text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
+                    mode === m ? 'bg-cozy-accent-strong text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
                   }`}
                 >
                   {m === 'full' ? 'Full' : 'Mini'}
@@ -244,7 +244,7 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 shrink-0 rounded-full bg-cozy-bg border border-cozy-primary text-cozy-text hover:bg-cozy-accent hover:text-white flex items-center justify-center text-sm transition"
+              className="w-8 h-8 shrink-0 rounded-full bg-cozy-bg border border-cozy-primary text-cozy-text hover:bg-cozy-accent-strong hover:text-white flex items-center justify-center text-sm transition"
               aria-label="Close editor"
             >
               ✕
@@ -401,7 +401,7 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
                         onClick={() => setExtra('spine_color', '')}
                         title="Auto (by genre)"
                         className={`h-7 px-2.5 rounded-full text-[11px] font-medium border transition ${
-                          !form.extra.spine_color ? 'bg-cozy-accent text-white border-cozy-accent' : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent'
+                          !form.extra.spine_color ? 'bg-cozy-accent-strong text-white border-cozy-accent' : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent'
                         }`}
                       >
                         Auto
@@ -519,9 +519,9 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
                 {form.quotes.map((quote, idx) => (
                   <div key={idx} className="bg-cozy-paper border border-cozy-primary/60 rounded-xl p-3 flex items-start justify-between gap-3">
                     <p className="font-serif italic text-xs leading-relaxed text-cozy-text">
-                      <span className="text-cozy-accent text-base not-italic mr-1">“</span>{quote}
+                      <span className="text-cozy-accent-ink text-base not-italic mr-1">“</span>{quote}
                     </p>
-                    <button type="button" onClick={() => set('quotes', form.quotes.filter((_, i) => i !== idx))} className="text-xs text-cozy-accent p-1" aria-label="Remove quote">
+                    <button type="button" onClick={() => set('quotes', form.quotes.filter((_, i) => i !== idx))} className="text-xs text-cozy-accent-ink p-1" aria-label="Remove quote">
                       ✕
                     </button>
                   </div>
@@ -548,7 +548,7 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
         )}
 
         {error && (
-          <p role="alert" className="text-xs text-cozy-accent bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">
+          <p role="alert" className="text-xs text-cozy-accent-ink bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">
             {error}
           </p>
         )}

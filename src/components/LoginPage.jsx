@@ -170,7 +170,7 @@ export default function LoginPage() {
             )}
 
             {error && (
-              <p role="alert" className="text-xs text-cozy-accent bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">
+              <p role="alert" className="text-xs text-cozy-accent-ink bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -184,7 +184,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-2.5 rounded-lg bg-cozy-accent text-white font-medium text-sm hover:bg-[#d97979] active:scale-[0.98] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-2 py-2.5 rounded-lg bg-cozy-accent-strong text-white font-medium text-sm hover:brightness-95 active:scale-[0.98] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading
                 ? isSignUp
@@ -202,7 +202,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => handleModeSwitch(false)}
-                    className="text-cozy-accent font-medium hover:underline focus:outline-none"
+                    className="text-cozy-accent-ink font-medium hover:underline focus:outline-none"
                   >
                     Sign in
                   </button>
@@ -213,7 +213,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => handleModeSwitch(true)}
-                    className="text-cozy-accent font-medium hover:underline focus:outline-none"
+                    className="text-cozy-accent-ink font-medium hover:underline focus:outline-none"
                   >
                     Create an account
                   </button>

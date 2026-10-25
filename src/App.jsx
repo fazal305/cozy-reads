@@ -26,7 +26,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-cozy-bg flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-cozy-card border border-cozy-border rounded-2xl p-6 shadow-sm text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-950/40 text-cozy-accent border border-red-100 dark:border-red-900 flex items-center justify-center mx-auto text-xl font-bold">
+          <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-950/40 text-cozy-accent-ink border border-red-100 dark:border-red-900 flex items-center justify-center mx-auto text-xl font-bold">
             !
           </div>
           <h2 className="font-serif text-2xl text-cozy-text">Configuration Needed</h2>

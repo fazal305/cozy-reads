@@ -54,7 +54,7 @@ function ToolButton({ label, icon, active, onClick, disabled, className = '' }) 
       aria-pressed={active === undefined ? undefined : active}
       title={label}
       className={`flex flex-col items-center justify-center gap-0.5 min-w-[2.75rem] h-11 px-1.5 rounded-xl text-[10px] font-medium transition disabled:opacity-35 ${
-        active ? 'bg-cozy-accent text-white shadow-sm' : 'text-cozy-text hover:bg-cozy-bg hover:text-cozy-accent'
+        active ? 'bg-cozy-accent-strong text-white shadow-sm' : 'text-cozy-text hover:bg-cozy-bg hover:text-cozy-accent-ink'
       } ${className}`}
     >
       <span aria-hidden="true" className="text-lg leading-none">{icon}</span>
@@ -664,7 +664,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
         <div className="min-w-0 flex-1">
           <h2 className="font-serif text-base text-cozy-text truncate">{entry.data.title || 'Untitled page'}</h2>
           <p className="text-[11px] text-cozy-muted truncate">
-            <span role="status" className={saveError ? 'text-cozy-accent' : ''}>{status}</span>
+            <span role="status" className={saveError ? 'text-cozy-accent-ink' : ''}>{status}</span>
             {bookTitle && <span> · 📖 {bookTitle}</span>}
           </p>
         </div>
@@ -779,7 +779,7 @@ export default function PageEditor({ entry, bookTitle, onSave, onClose }) {
           <form onSubmit={addImage} className="space-y-3">
             <label htmlFor="journal-image-url" className="block text-xs font-medium text-cozy-text">Image link</label>
             <input id="journal-image-url" type="url" inputMode="url" className={input} placeholder="https://…" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-            {imageError && <p role="alert" className="text-xs text-cozy-accent">{imageError}</p>}
+            {imageError && <p role="alert" className="text-xs text-cozy-accent-ink">{imageError}</p>}
             <p className="text-xs text-cozy-muted">Paste a link to an image that starts with https://. Photo uploads are coming later.</p>
             <button type="submit" className={primaryButton}>Add image</button>
           </form>

@@ -190,7 +190,7 @@ export default function BookBingo({ books, openEditor }) {
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h3 className="font-serif text-lg text-cozy-text break-words min-w-0">{board.name}</h3>
-        <p role="status" className={`text-sm font-medium ${state.lines.length ? 'text-cozy-accent' : 'text-cozy-muted'}`}>{status}</p>
+        <p role="status" className={`text-sm font-medium ${state.lines.length ? 'text-cozy-accent-ink' : 'text-cozy-muted'}`}>{status}</p>
       </div>
 
       <div
@@ -225,7 +225,7 @@ export default function BookBingo({ books, openEditor }) {
                   </span>
                 </>
               ) : (
-                <span className={`absolute inset-0 flex items-center justify-center p-0.5 sm:p-1.5 text-[9px] sm:text-xs leading-tight break-words ${free ? 'font-semibold text-cozy-accent' : 'text-cozy-text'}`}>
+                <span className={`absolute inset-0 flex items-center justify-center p-0.5 sm:p-1.5 text-[9px] sm:text-xs leading-tight break-words ${free ? 'font-semibold text-cozy-accent-ink' : 'text-cozy-text'}`}>
                   {free ? '⭐ Free' : prompt || <span className="text-cozy-muted">+ prompt</span>}
                 </span>
               )}

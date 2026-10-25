@@ -118,7 +118,7 @@ export default function HaulTracker({ books, openEditor }) {
                     + Library
                   </button>
                 )}
-                <button type="button" onClick={() => run(remove(entry.id))} className="text-xs text-cozy-accent p-1 shrink-0" aria-label={`Delete ${d.title}`}>
+                <button type="button" onClick={() => run(remove(entry.id))} className="text-xs text-cozy-accent-ink p-1 shrink-0" aria-label={`Delete ${d.title}`}>
                   ✕
                 </button>
               </li>

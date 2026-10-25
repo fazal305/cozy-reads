@@ -11,6 +11,8 @@ export default {
           paper: 'rgb(var(--cozy-paper) / <alpha-value>)',
           primary: 'rgb(var(--cozy-primary) / <alpha-value>)',
           accent: 'rgb(var(--cozy-accent) / <alpha-value>)',
+          'accent-strong': 'rgb(var(--cozy-accent-strong, var(--cozy-accent)) / <alpha-value>)',
+          'accent-ink': 'rgb(var(--cozy-accent-ink, var(--cozy-accent)) / <alpha-value>)',
           text: 'rgb(var(--cozy-text) / <alpha-value>)',
           muted: 'rgb(var(--cozy-muted) / <alpha-value>)',
           border: 'rgb(var(--cozy-border) / <alpha-value>)',

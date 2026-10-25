@@ -208,7 +208,7 @@ export default function BookBracket({ books, openEditor }) {
         <div className="flex items-center gap-4 p-4 rounded-2xl border-2 border-cozy-accent bg-cozy-accent/10 animate-bounce-in" role="status">
           <BookCover book={champ} className="w-14 h-20 shrink-0 [&_span+span]:hidden" />
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-cozy-accent">👑 {year} champion</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cozy-accent-ink">👑 {year} champion</p>
             <p className="font-serif text-lg text-cozy-text break-words">{champ.title}</p>
             {champ.author && <p className="text-xs text-cozy-muted">{champ.author}</p>}
           </div>

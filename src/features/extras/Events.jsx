@@ -21,7 +21,7 @@ function EventRow({ entry, onRemove, next = false }) {
   const days = daysUntil(entry.data.date);
   return (
     <li className={`flex items-center gap-3 p-3 rounded-xl bg-cozy-paper border min-w-0 ${next ? 'border-cozy-accent' : 'border-cozy-primary/60'}`}>
-      <div className={`w-14 shrink-0 text-center rounded-lg py-1.5 ${days !== null && days >= 0 ? 'bg-cozy-accent/15 text-cozy-accent' : 'bg-cozy-primary/20 text-cozy-muted'}`}>
+      <div className={`w-14 shrink-0 text-center rounded-lg py-1.5 ${days !== null && days >= 0 ? 'bg-cozy-accent/15 text-cozy-accent-ink' : 'bg-cozy-primary/20 text-cozy-muted'}`}>
         <p className="font-serif text-lg leading-none">{days !== null && days >= 0 ? days : '✓'}</p>
         <p className="text-[9px] uppercase tracking-wide mt-0.5">{days !== null && days >= 0 ? (days === 1 ? 'day' : 'days') : 'past'}</p>
       </div>

@@ -62,11 +62,11 @@ export default function QuotesCollection({ books, openEditor }) {
           {shown.map((item) => (
             <li key={item.id} className="rounded-2xl border border-cozy-border bg-cozy-bg/50 p-4 flex flex-col gap-3">
               <blockquote className="font-serif italic text-cozy-text text-sm leading-relaxed break-words">
-                <span className="text-cozy-accent text-lg not-italic mr-0.5" aria-hidden="true">“</span>
+                <span className="text-cozy-accent-ink text-lg not-italic mr-0.5" aria-hidden="true">“</span>
                 {item.text}
               </blockquote>
               <div className="flex items-center justify-between gap-2 mt-auto">
-                <button type="button" onClick={() => openEditor(item.book)} className="min-w-0 text-left text-xs text-cozy-muted hover:text-cozy-accent truncate">
+                <button type="button" onClick={() => openEditor(item.book)} className="min-w-0 text-left text-xs text-cozy-muted hover:text-cozy-accent-ink truncate">
                   — {item.book.title}{item.book.author ? `, ${item.book.author}` : ''}
                 </button>
                 <button type="button" onClick={() => copy(item)} className={`${softButton} shrink-0`} aria-label={`Copy quote from ${item.book.title}`}>

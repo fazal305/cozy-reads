@@ -65,7 +65,7 @@ export default function BooksReadLog({ books, booksApi, openEditor }) {
                       <button
                         type="button"
                         onClick={() => openEditor(book)}
-                        className="block max-w-full text-left font-medium text-cozy-text hover:text-cozy-accent truncate"
+                        className="block max-w-full text-left font-medium text-cozy-text hover:text-cozy-accent-ink truncate"
                         title={book.title}
                       >
                         {book.title}

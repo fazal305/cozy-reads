@@ -192,7 +192,7 @@ function Subscriptions({ currency, run }) {
                 <p className="text-sm text-cozy-text font-medium break-words">{s.data.service}</p>
                 <p className="text-[11px] text-cozy-muted">
                   {money(s.data.cost)}
-                  {s.data.renewal_date && <> · renews {dateLabel(s.data.renewal_date)} <span className="text-cozy-accent">({countdown(s.data.renewal_date)})</span></>}
+                  {s.data.renewal_date && <> · renews {dateLabel(s.data.renewal_date)} <span className="text-cozy-accent-ink">({countdown(s.data.renewal_date)})</span></>}
                 </p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -253,7 +253,7 @@ function SavingsGoal({ goal, currency, onSave, onRemove }) {
           {contributions.slice(-6).reverse().map((c) => (
             <li key={c.id} className="inline-flex items-center gap-1">
               {dateLabel(c.date)}: {money(c.amount)}
-              <button type="button" onClick={() => onSave(contributions.filter((x) => x.id !== c.id))} aria-label={`Remove contribution from ${dateLabel(c.date)}`} className="hover:text-cozy-accent">✕</button>
+              <button type="button" onClick={() => onSave(contributions.filter((x) => x.id !== c.id))} aria-label={`Remove contribution from ${dateLabel(c.date)}`} className="hover:text-cozy-accent-ink">✕</button>
             </li>
           ))}
         </ul>

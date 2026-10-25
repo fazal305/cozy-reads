@@ -76,7 +76,7 @@ export default function GoalTracker({ goal, onLogBook, onUpdateChallenge }) {
           onClick={handleLog}
           disabled={logLoading}
           aria-label="Log a finished book"
-          className="relative inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cozy-accent text-white font-medium text-sm shadow-sm hover:brightness-95 active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cozy-accent-strong text-white font-medium text-sm shadow-sm hover:brightness-95 active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span aria-hidden="true">♥</span>
           {logLoading ? 'Saving…' : 'I finished a book!'}
@@ -84,13 +84,13 @@ export default function GoalTracker({ goal, onLogBook, onUpdateChallenge }) {
       </div>
 
       {logError && (
-        <p role="alert" className="text-sm text-cozy-accent text-center mt-3 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-4 py-2">
+        <p role="alert" className="text-sm text-cozy-accent-ink text-center mt-3 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-4 py-2">
           {logError}
         </p>
       )}
 
       {pct >= 100 && (
-        <p className="text-center text-sm font-serif text-cozy-accent mt-4 animate-bounce-in">
+        <p className="text-center text-sm font-serif text-cozy-accent-ink mt-4 animate-bounce-in">
           🎉 Challenge complete — what a reader!
         </p>
       )}

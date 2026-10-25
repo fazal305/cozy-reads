@@ -155,7 +155,7 @@ export default function ReadingLog({ books }) {
               <button
                 type="button"
                 onClick={() => run(remove(entry.id))}
-                className="text-xs text-cozy-accent p-1 shrink-0"
+                className="text-xs text-cozy-accent-ink p-1 shrink-0"
                 aria-label={`Delete log for ${formatDate(entry.entry_date)}`}
               >
                 ✕

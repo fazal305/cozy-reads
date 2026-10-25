@@ -28,7 +28,7 @@ function BookRow({ book, onOpen, children }) {
       <button type="button" onClick={() => onOpen(book)} className="flex items-center gap-3 min-w-0 flex-1 text-left group">
         <BookCover book={book} className="w-10 h-14 shrink-0" />
         <span className="min-w-0">
-          <span className="block font-serif text-sm text-cozy-text truncate group-hover:text-cozy-accent transition">{book.title}</span>
+          <span className="block font-serif text-sm text-cozy-text truncate group-hover:text-cozy-accent-ink transition">{book.title}</span>
           <span className="block text-xs text-cozy-muted truncate">{book.author || 'Unknown author'}</span>
         </span>
       </button>
@@ -72,7 +72,7 @@ function QuickAdd({ onAdd, withPrice = false, label }) {
           {label}
         </button>
       </div>
-      {error && <p role="alert" className="text-xs text-cozy-accent">{error}</p>}
+      {error && <p role="alert" className="text-xs text-cozy-accent-ink">{error}</p>}
     </form>
   );
 }
@@ -139,7 +139,7 @@ export default function TbrTab({ books, booksApi, openEditor }) {
         ))}
       </div>
 
-      {error && <p role="alert" className="text-xs text-cozy-accent bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">{error}</p>}
+      {error && <p role="alert" className="text-xs text-cozy-accent-ink bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900 rounded-lg px-3 py-2">{error}</p>}
 
       {view === 'list' && (
         <div className="space-y-4">
@@ -179,7 +179,7 @@ export default function TbrTab({ books, booksApi, openEditor }) {
                         <button type="button" onClick={() => openEditor(book)} className="w-full flex items-center gap-2 text-left group">
                           <BookCover book={book} className="w-8 h-12 shrink-0" />
                           <span className="min-w-0">
-                            <span className="block text-sm font-serif text-cozy-text truncate group-hover:text-cozy-accent">{book.title}</span>
+                            <span className="block text-sm font-serif text-cozy-text truncate group-hover:text-cozy-accent-ink">{book.title}</span>
                             <span className="block text-[11px] text-cozy-muted truncate">{book.author}</span>
                           </span>
                         </button>

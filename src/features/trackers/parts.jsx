@@ -15,7 +15,7 @@ export function SectionTitle({ icon, title, subtitle, children }) {
 export function ErrorNote({ error }) {
   if (!error) return null;
   return (
-    <p role="alert" className="text-xs text-cozy-accent font-medium mb-3">
+    <p role="alert" className="text-xs text-cozy-accent-ink font-medium mb-3">
       {error}
     </p>
   );
@@ -70,7 +70,7 @@ export function Field({ label, htmlFor, className = '', children }) {
 export function Stars({ value }) {
   if (!value) return <span className="text-xs text-cozy-muted">–</span>;
   return (
-    <span className="text-cozy-accent text-xs whitespace-nowrap" role="img" aria-label={`${value} of 5 stars`}>
+    <span className="text-cozy-accent-ink text-xs whitespace-nowrap" role="img" aria-label={`${value} of 5 stars`}>
       {'★'.repeat(value)}
       <span className="opacity-30">{'★'.repeat(Math.max(0, 5 - value))}</span>
     </span>

@@ -75,7 +75,7 @@ export default function TbrJar({ tbr, booksApi, openEditor }) {
         <div className="w-full max-w-sm bg-cozy-bg border border-cozy-primary rounded-2xl p-4 flex gap-4 items-center text-left animate-bounce-in" role="status">
           <BookCover book={picked} className="w-16 h-24 shrink-0" />
           <div className="min-w-0 flex-1 space-y-2">
-            <p className="text-[11px] uppercase tracking-wider text-cozy-accent font-semibold">The jar has spoken</p>
+            <p className="text-[11px] uppercase tracking-wider text-cozy-accent-ink font-semibold">The jar has spoken</p>
             <p className="font-serif text-base text-cozy-text leading-tight">{picked.title}</p>
             {picked.author && <p className="text-xs text-cozy-muted">{picked.author}</p>}
             <div className="flex gap-2 flex-wrap">
@@ -85,7 +85,7 @@ export default function TbrJar({ tbr, booksApi, openEditor }) {
           </div>
         </div>
       )}
-      {error && <p role="alert" className="text-xs text-cozy-accent">{error}</p>}
+      {error && <p role="alert" className="text-xs text-cozy-accent-ink">{error}</p>}
     </div>
   );
 }

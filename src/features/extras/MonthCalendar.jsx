@@ -32,7 +32,7 @@ export default function MonthCalendar({ month, label, renderDay }) {
                 date === now ? 'border-cozy-accent bg-cozy-paper' : 'border-cozy-primary/40 bg-cozy-paper/60'
               }`}
             >
-              <span className={`text-[10px] sm:text-xs leading-none ${date === now ? 'text-cozy-accent font-semibold' : 'text-cozy-muted'}`}>
+              <span className={`text-[10px] sm:text-xs leading-none ${date === now ? 'text-cozy-accent-ink font-semibold' : 'text-cozy-muted'}`}>
                 <span className="sr-only">{parseDate(date).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</span>
                 <span aria-hidden="true">{Number(date.slice(8))}</span>
               </span>

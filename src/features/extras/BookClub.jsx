@@ -111,7 +111,7 @@ function Discussion({ meeting, onSave }) {
               <label htmlFor={`${base}-${q.id}`} className="text-sm text-cozy-text break-words min-w-0">
                 <span className="text-cozy-muted">{i + 1}.</span> {q.text}
               </label>
-              <button type="button" onClick={() => change(questions.filter((x) => x.id !== q.id))} aria-label={`Remove question ${i + 1}`} className="text-xs text-cozy-muted hover:text-cozy-accent shrink-0">
+              <button type="button" onClick={() => change(questions.filter((x) => x.id !== q.id))} aria-label={`Remove question ${i + 1}`} className="text-xs text-cozy-muted hover:text-cozy-accent-ink shrink-0">
                 ✕
               </button>
             </div>
@@ -166,7 +166,7 @@ function Meeting({ meeting, clubName, onOpen, onSave, onRemove, highlight = fals
             {clubName && <span>{clubName} · </span>}
             {dateLabel(meeting.date)}
             {meeting.time && ` · ${meeting.time}`}
-            {upcoming && <span className="text-cozy-accent font-medium"> · {countdown(meeting.date)}</span>}
+            {upcoming && <span className="text-cozy-accent-ink font-medium"> · {countdown(meeting.date)}</span>}
           </p>
           {meeting.location && (
             <p className="text-xs text-cozy-text mt-0.5">
@@ -184,7 +184,7 @@ function Meeting({ meeting, clubName, onOpen, onSave, onRemove, highlight = fals
       </div>
       {onSave && (
         <>
-          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="mt-2 text-xs text-cozy-accent hover:underline">
+          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="mt-2 text-xs text-cozy-accent-ink hover:underline">
             {open ? 'Hide discussion' : `Discussion${meeting.questions?.length ? ` (${plural(meeting.questions.length, 'question')})` : ''}`}
           </button>
           {open && <div className="mt-2"><Discussion meeting={meeting} onSave={onSave} /></div>}

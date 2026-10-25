@@ -163,7 +163,7 @@ export default function SeriesTracker({ books, openEditor }) {
               <p className="text-xs mt-2 text-cozy-text">
                 <span className="font-semibold">Next up:</span>{' '}
                 {g.next ? (
-                  <button type="button" onClick={() => openEditor(g.next)} className="text-cozy-accent hover:underline">{g.nextLabel}</button>
+                  <button type="button" onClick={() => openEditor(g.next)} className="text-cozy-accent-ink hover:underline">{g.nextLabel}</button>
                 ) : (
                   <span className="text-cozy-muted">{g.nextLabel || 'All caught up 🎉'}</span>
                 )}
@@ -175,7 +175,7 @@ export default function SeriesTracker({ books, openEditor }) {
                       type="button"
                       onClick={() => openEditor(b)}
                       className={`px-2 py-1 rounded-lg text-[11px] border transition max-w-[14rem] truncate ${
-                        b.status === 'read' ? 'bg-cozy-accent text-white border-cozy-accent' : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent'
+                        b.status === 'read' ? 'bg-cozy-accent-strong text-white border-cozy-accent' : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent'
                       }`}
                       title={`${b.title} · ${statusLabel(b.status)}`}
                     >
@@ -210,7 +210,7 @@ export default function SeriesTracker({ books, openEditor }) {
                       {d.author ? `${d.author} · ` : ''}{total} books · next up: {read >= total ? 'all read 🎉' : `#${read + 1}`}
                     </p>
                   </div>
-                  <button type="button" onClick={() => run(remove(entry.id))} className="text-xs text-cozy-accent p-1 shrink-0" aria-label={`Remove ${d.name}`}>✕</button>
+                  <button type="button" onClick={() => run(remove(entry.id))} className="text-xs text-cozy-accent-ink p-1 shrink-0" aria-label={`Remove ${d.name}`}>✕</button>
                 </div>
                 <Progress read={read} owned={owned} total={total} />
                 <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-cozy-muted">

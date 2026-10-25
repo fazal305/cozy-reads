@@ -98,7 +98,7 @@ export default function CountChallenge({ books, openEditor }) {
                   <span className="absolute inset-0">
                     <BookCover book={book} className="w-full h-full [&_span+span]:hidden" />
                   </span>
-                  <span className="absolute top-0 left-0 bg-cozy-accent text-white text-[8px] sm:text-[10px] font-semibold px-1 rounded-br-md">{i + 1}</span>
+                  <span className="absolute top-0 left-0 bg-cozy-accent-strong text-white text-[8px] sm:text-[10px] font-semibold px-1 rounded-br-md">{i + 1}</span>
                 </button>
               ) : (
                 <span role="img" className="flex w-full h-full items-center justify-center rounded-md border border-dashed border-cozy-primary text-[9px] sm:text-xs text-cozy-muted" aria-label={`Book ${i + 1}: not read yet`}>

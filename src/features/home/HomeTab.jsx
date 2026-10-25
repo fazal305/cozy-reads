@@ -39,7 +39,7 @@ export default function HomeTab({ books, goalApi, openEditor, onSelectTab }) {
       <section className={card}>
         <div className="flex items-center justify-between gap-3 mb-4">
           <h2 className="font-serif text-xl text-cozy-text">Currently reading</h2>
-          <button type="button" onClick={() => onSelectTab('tbr')} className="text-xs text-cozy-accent hover:underline">
+          <button type="button" onClick={() => onSelectTab('tbr')} className="text-xs text-cozy-accent-ink hover:underline">
             Pick from TBR →
           </button>
         </div>
@@ -69,7 +69,7 @@ export default function HomeTab({ books, goalApi, openEditor, onSelectTab }) {
       {!loading && error && (
         <div className="bg-cozy-card rounded-2xl border border-red-200 dark:border-red-900 p-6 text-center space-y-3">
           <p className="text-cozy-text">{error}</p>
-          <button onClick={refetch} className="text-sm px-4 py-2 rounded-lg bg-cozy-accent text-white hover:brightness-95 transition">
+          <button onClick={refetch} className="text-sm px-4 py-2 rounded-lg bg-cozy-accent-strong text-white hover:brightness-95 transition">
             Try again
           </button>
         </div>
@@ -82,7 +82,7 @@ export default function HomeTab({ books, goalApi, openEditor, onSelectTab }) {
             Your reading goal for {CURRENT_YEAR} hasn't been created yet.
             Make sure the database trigger ran on signup, or contact the admin.
           </p>
-          <button onClick={refetch} className="text-sm text-cozy-accent hover:underline">
+          <button onClick={refetch} className="text-sm text-cozy-accent-ink hover:underline">
             Refresh
           </button>
         </div>

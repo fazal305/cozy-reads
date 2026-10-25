@@ -126,7 +126,7 @@ function ChallengeForm({ initial, onSubmit, onCancel }) {
           <input type="date" className={input} value={form.end} onChange={(e) => set('end', e.target.value)} />
         </label>
       </div>
-      {form.start && form.end && form.start > form.end && <p role="alert" className="text-xs text-cozy-accent">The end date is before the start date.</p>}
+      {form.start && form.end && form.start > form.end && <p role="alert" className="text-xs text-cozy-accent-ink">The end date is before the start date.</p>}
       <div className="flex gap-2">
         <button type="submit" disabled={busy || !valid} className={primaryButton}>{initial ? 'Save changes' : 'Create challenge'}</button>
         <button type="button" onClick={onCancel} className={softButton}>Cancel</button>
@@ -167,7 +167,7 @@ function ChallengeCard({ entry, books, openEditor, onSave, onEdit, onDelete }) {
           <h3 className="font-serif text-lg text-cozy-text break-words">{done ? '🏅 ' : ''}{data.name}</h3>
           <p className="text-xs text-cozy-muted break-words">{ruleSummary(data)}</p>
         </div>
-        <span className={`shrink-0 text-sm font-semibold ${done ? 'text-cozy-accent' : 'text-cozy-text'}`}>{list.length}/{data.goal}</span>
+        <span className={`shrink-0 text-sm font-semibold ${done ? 'text-cozy-accent-ink' : 'text-cozy-text'}`}>{list.length}/{data.goal}</span>
       </div>
       <ProgressBar value={list.length} max={data.goal} label={`${data.name} progress`} />
       <div className="flex flex-wrap gap-2">
@@ -186,7 +186,7 @@ function ChallengeCard({ entry, books, openEditor, onSave, onEdit, onDelete }) {
               <button type="button" onClick={() => openEditor?.(item.book)} className="flex items-center gap-3 min-w-0 flex-1 text-left group">
                 <BookCover book={item.book} className="w-8 h-11 shrink-0 [&_span+span]:hidden" />
                 <span className="min-w-0">
-                  <span className="block font-serif text-sm text-cozy-text truncate group-hover:text-cozy-accent transition">{item.book.title}</span>
+                  <span className="block font-serif text-sm text-cozy-text truncate group-hover:text-cozy-accent-ink transition">{item.book.title}</span>
                   <span className="block text-[11px] text-cozy-muted">{item.manual ? 'Linked by hand' : 'Matched'} · {finishStamp(item.book)}</span>
                 </span>
               </button>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { STICKERS } from '../../data/stickers';
+import { STICKERS, STICKER_CATEGORIES } from '../../data/stickers';
 import { pill } from '../../lib/ui';
 import { WashiSvg, ShapeSvg } from './decor';
 import { DECOR_COLORS, WASHI_STYLES, SHAPES } from './templates';
@@ -11,10 +11,8 @@ const TABS = [
   { id: 'shapes', label: 'Shapes' },
 ];
 
-const CATEGORY_LABELS = { ratings: 'Ratings', tropes: 'Tropes', cozy: 'Cozy' };
-
 function categoryLabel(id) {
-  return CATEGORY_LABELS[id] || id.charAt(0).toUpperCase() + id.slice(1);
+  return STICKER_CATEGORIES.find((c) => c.id === id)?.label || id;
 }
 
 export function DecorPreview({ payload }) {
@@ -37,7 +35,7 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
   const [tab, setTab] = useState('stickers');
   const [category, setCategory] = useState('all');
   const [color, setColor] = useState(DECOR_COLORS[0]);
-  const categories = ['all', ...new Set(STICKERS.map((s) => s.category))];
+  const categories = ['all', ...STICKER_CATEGORIES.map((c) => c.id).filter((id) => STICKERS.some((s) => s.category === id))];
 
   let options;
   if (tab === 'stickers') {
@@ -63,11 +61,11 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
     >
       <div className="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
         <h2 className="font-serif text-base text-cozy-text">Add to page</h2>
-        <button type="button" onClick={onClose} aria-label="Close drawer" className="w-8 h-8 rounded-full border border-cozy-primary bg-cozy-bg text-cozy-text hover:text-cozy-accent flex items-center justify-center text-sm">
+        <button type="button" onClick={onClose} aria-label="Close drawer" className="w-8 h-8 rounded-full border border-cozy-primary bg-cozy-bg text-cozy-text hover:text-cozy-accent-ink flex items-center justify-center text-sm">
           ✕
         </button>
       </div>
-      <div role="tablist" aria-label="Decoration type" className="flex gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Decoration type" className="flex shrink-0 gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide">
         {TABS.map((t) => (
           <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={pill(tab === t.id)}>
             {t.label}
@@ -75,7 +73,7 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
         ))}
       </div>
       {tab === 'stickers' ? (
-        <div className="flex gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide" aria-label="Sticker category">
+        <div className="flex shrink-0 gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide" aria-label="Sticker category">
           {categories.map((c) => (
             <button key={c} type="button" aria-pressed={category === c} onClick={() => setCategory(c)} className={`${pill(category === c)} !py-1`}>
               {c === 'all' ? 'All' : categoryLabel(c)}
@@ -83,7 +81,7 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
           ))}
         </div>
       ) : (
-        <div className="flex gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide" aria-label="Colour">
+        <div className="flex shrink-0 gap-1.5 px-4 pb-2 overflow-x-auto scrollbar-hide" aria-label="Colour">
           {DECOR_COLORS.map((c) => (
             <button
               key={c}
@@ -97,7 +95,7 @@ export default function StickerDrawer({ onPick, onDragStart, onClose }) {
           ))}
         </div>
       )}
-      <p className="px-4 pb-1 text-[11px] text-cozy-muted">Drag onto the page, or tap to add it in the middle.</p>
+      <p className="shrink-0 px-4 pb-1 text-[11px] text-cozy-muted">Drag onto the page, or tap to add it in the middle.</p>
       <ul className="grid grid-cols-4 sm:grid-cols-3 gap-2 px-4 pb-4 pt-1 overflow-y-auto overscroll-contain">
         {options.map((o) => (
           <li key={o.key}>

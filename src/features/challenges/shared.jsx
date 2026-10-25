@@ -18,7 +18,7 @@ export function YearSelect({ id, value, onChange, books, allowAll = false }) {
 
 export function ErrorNote({ message }) {
   if (!message) return null;
-  return <p role="alert" className="text-xs text-cozy-accent">{message}</p>;
+  return <p role="alert" className="text-xs text-cozy-accent-ink">{message}</p>;
 }
 
 export function ProgressRing({ value, max, size = 96, label }) {
@@ -86,14 +86,14 @@ export function Modal({ title, eyebrow, onClose, children, labelId }) {
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            {eyebrow && <span className="text-[11px] font-semibold uppercase tracking-wider text-cozy-accent">{eyebrow}</span>}
+            {eyebrow && <span className="text-[11px] font-semibold uppercase tracking-wider text-cozy-accent-ink">{eyebrow}</span>}
             <h3 id={labelId} className="font-serif text-xl text-cozy-text leading-tight break-words">{title}</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="w-8 h-8 shrink-0 rounded-full bg-cozy-bg border border-cozy-primary text-cozy-text hover:bg-cozy-accent hover:text-white flex items-center justify-center text-sm transition"
+            className="w-8 h-8 shrink-0 rounded-full bg-cozy-bg border border-cozy-primary text-cozy-text hover:bg-cozy-accent-strong hover:text-white flex items-center justify-center text-sm transition"
           >
             ✕
           </button>
@@ -137,8 +137,8 @@ export function BookList({ books, selectedId, suggested = [], onPick, openEditor
                   <span className="block font-serif text-sm text-cozy-text truncate">{book.title}</span>
                   <span className="block text-xs text-cozy-muted truncate">{book.author || 'Unknown author'}</span>
                 </span>
-                {suggestedIds.has(book.id) && <span className="text-[10px] font-semibold uppercase tracking-wide text-cozy-accent shrink-0">Match</span>}
-                {selectedId === book.id && <span className="text-cozy-accent shrink-0" aria-hidden="true">✓</span>}
+                {suggestedIds.has(book.id) && <span className="text-[10px] font-semibold uppercase tracking-wide text-cozy-accent-ink shrink-0">Match</span>}
+                {selectedId === book.id && <span className="text-cozy-accent-ink shrink-0" aria-hidden="true">✓</span>}
               </button>
             </li>
           ))}

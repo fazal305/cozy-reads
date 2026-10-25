@@ -117,7 +117,7 @@ function AddItem({ onAdd }) {
             <input id="board-caption" className={input} value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Rainy window vibes" />
           </Field>
           <button type="submit" disabled={!url.trim()} className={primaryButton}>+ Image</button>
-          {urlError && <p id="board-url-error" role="alert" className="text-xs text-cozy-accent sm:col-span-3">{urlError}</p>}
+          {urlError && <p id="board-url-error" role="alert" className="text-xs text-cozy-accent-ink sm:col-span-3">{urlError}</p>}
         </form>
       )}
 

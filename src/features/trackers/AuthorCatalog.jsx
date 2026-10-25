@@ -67,7 +67,7 @@ export default function AuthorCatalog({ books, openEditor }) {
                   onClick={() => toggleStar(a)}
                   aria-pressed={Boolean(a.star)}
                   aria-label={`${a.star ? 'Unstar' : 'Star'} ${a.name}`}
-                  className={`text-xl leading-none shrink-0 transition hover:scale-110 ${a.star ? 'text-cozy-accent' : 'text-cozy-muted opacity-50'}`}
+                  className={`text-xl leading-none shrink-0 transition hover:scale-110 ${a.star ? 'text-cozy-accent-ink' : 'text-cozy-muted opacity-50'}`}
                 >
                   {a.star ? '★' : '☆'}
                 </button>
@@ -80,20 +80,20 @@ export default function AuthorCatalog({ books, openEditor }) {
                   {a.favourite && (
                     <p className="text-xs text-cozy-text mt-1 truncate">
                       <span className="font-semibold">Favourite:</span>{' '}
-                      <button type="button" onClick={() => openEditor(a.favourite)} className="text-cozy-accent hover:underline">
+                      <button type="button" onClick={() => openEditor(a.favourite)} className="text-cozy-accent-ink hover:underline">
                         {a.favourite.title}
                       </button>{' '}
                       <Stars value={a.favourite.rating} />
                     </p>
                   )}
                   <details className="mt-1.5 group">
-                    <summary className="text-[11px] text-cozy-muted cursor-pointer hover:text-cozy-accent w-fit">
+                    <summary className="text-[11px] text-cozy-muted cursor-pointer hover:text-cozy-accent-ink w-fit">
                       Catalog ({a.books.length})
                     </summary>
                     <ul className="mt-1.5 space-y-1">
                       {a.books.map((b) => (
                         <li key={b.id} className="flex items-center gap-2 text-xs">
-                          <button type="button" onClick={() => openEditor(b)} className="flex-1 min-w-0 truncate text-left text-cozy-text hover:text-cozy-accent">
+                          <button type="button" onClick={() => openEditor(b)} className="flex-1 min-w-0 truncate text-left text-cozy-text hover:text-cozy-accent-ink">
                             {b.title}
                           </button>
                           <span className="text-[10px] text-cozy-muted shrink-0">{statusLabel(b.status)}</span>

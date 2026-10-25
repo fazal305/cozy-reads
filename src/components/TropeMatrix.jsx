@@ -26,8 +26,8 @@ export default function TropeMatrix({ selected, onChange }) {
               className={[
                 'px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
                 active
-                  ? 'bg-cozy-accent text-white border-cozy-accent shadow-sm'
-                  : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent hover:text-cozy-accent',
+                  ? 'bg-cozy-accent-strong text-white border-cozy-accent shadow-sm'
+                  : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent hover:text-cozy-accent-ink',
               ].join(' ')}
             >
               {trope}

@@ -27,6 +27,16 @@
     color-scheme: dark;
   }
 
+  :root[data-palette='rose'] {
+    --cozy-accent-strong: 184 67 79;
+    --cozy-accent-ink: 184 67 79;
+  }
+
+  :root.dark[data-palette='rose'] {
+    --cozy-accent-strong: 184 67 79;
+    --cozy-accent-ink: 217 122 126;
+  }
+
   :root[data-palette='sage'] {
     --cozy-bg: 243 247 240;
     --cozy-card: 255 255 255;

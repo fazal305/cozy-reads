@@ -99,7 +99,7 @@ export default function MonthlyView({ books, booksApi, openEditor }) {
                   <BookCover book={list[0]} className="w-full aspect-[2/3] !rounded-md [&_span:not(:first-child)]:hidden [&_span]:text-sm" />
                 </button>
                 {list.length > 1 && (
-                  <span className="absolute -top-1 -right-0.5 text-[9px] font-semibold bg-cozy-accent text-white rounded-full px-1" title={list.slice(1).map((b) => b.title).join(', ')}>
+                  <span className="absolute -top-1 -right-0.5 text-[9px] font-semibold bg-cozy-accent-strong text-white rounded-full px-1" title={list.slice(1).map((b) => b.title).join(', ')}>
                     +{list.length - 1}
                   </span>
                 )}
@@ -119,7 +119,7 @@ export default function MonthlyView({ books, booksApi, openEditor }) {
                   <BookCover book={book} className="w-20 h-28 group-hover:-translate-y-0.5 transition" />
                   <span className="block font-serif text-[11px] text-cozy-text truncate mt-1">{book.title}</span>
                 </button>
-                <button type="button" onClick={() => removeHopeful(book)} className="text-[11px] text-cozy-muted hover:text-cozy-accent" aria-label={`Remove ${book.title} from hopefuls`}>
+                <button type="button" onClick={() => removeHopeful(book)} className="text-[11px] text-cozy-muted hover:text-cozy-accent-ink" aria-label={`Remove ${book.title} from hopefuls`}>
                   Remove
                 </button>
               </li>
@@ -162,9 +162,9 @@ export default function MonthlyView({ books, booksApi, openEditor }) {
                 <button type="button" onClick={() => openEditor(favourite)} className="flex items-center gap-3 text-left group">
                   <BookCover book={favourite} className="w-12 h-[4.5rem] shrink-0" />
                   <span className="min-w-0">
-                    <span className="block font-serif text-sm text-cozy-text group-hover:text-cozy-accent truncate">{favourite.title}</span>
+                    <span className="block font-serif text-sm text-cozy-text group-hover:text-cozy-accent-ink truncate">{favourite.title}</span>
                     <span className="block text-xs text-cozy-muted truncate">{favourite.author}</span>
-                    {favourite.rating && <span className="block text-xs text-cozy-accent">{'★'.repeat(Math.round(favourite.rating))}</span>}
+                    {favourite.rating && <span className="block text-xs text-cozy-accent-ink">{'★'.repeat(Math.round(favourite.rating))}</span>}
                   </span>
                 </button>
               ) : (

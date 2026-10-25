@@ -109,7 +109,7 @@ export default function BookshelfTab({ books, booksApi, openEditor }) {
                 onClick={() => setView(v.key)}
                 aria-pressed={view === v.key}
                 className={`px-3 py-1 text-xs font-medium rounded-lg transition ${
-                  view === v.key ? 'bg-cozy-accent text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
+                  view === v.key ? 'bg-cozy-accent-strong text-white shadow-sm' : 'text-cozy-muted hover:text-cozy-text'
                 }`}
               >
                 {v.label}
@@ -141,7 +141,7 @@ export default function BookshelfTab({ books, booksApi, openEditor }) {
             ★ 5-star &amp; favourites
           </button>
           {filtersActive && (
-            <button type="button" onClick={clearFilters} className="text-xs text-cozy-accent hover:underline">
+            <button type="button" onClick={clearFilters} className="text-xs text-cozy-accent-ink hover:underline">
               Clear filters
             </button>
           )}
@@ -203,7 +203,7 @@ export default function BookshelfTab({ books, booksApi, openEditor }) {
                   <span className="absolute bottom-2 right-2 text-base" aria-hidden="true">{moodEmoji(book.mood)}</span>
                 )}
               </div>
-              <h4 className="font-serif text-sm font-semibold text-cozy-text truncate leading-tight group-hover:text-cozy-accent transition">
+              <h4 className="font-serif text-sm font-semibold text-cozy-text truncate leading-tight group-hover:text-cozy-accent-ink transition">
                 {book.favorite && <span className="text-amber-500 mr-1" aria-label="Favourite">★</span>}
                 {book.title}
               </h4>

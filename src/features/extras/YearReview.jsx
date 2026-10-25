@@ -58,7 +58,7 @@ function BookLine({ book, onOpen, detail }) {
     <button type="button" onClick={() => onOpen(book)} className="flex items-center gap-3 text-left group min-w-0 w-full">
       <BookCover book={book} className="w-10 h-14 shrink-0" />
       <span className="min-w-0">
-        <span className="block font-serif text-sm text-cozy-text truncate group-hover:text-cozy-accent">{book.title}</span>
+        <span className="block font-serif text-sm text-cozy-text truncate group-hover:text-cozy-accent-ink">{book.title}</span>
         <span className="block text-xs text-cozy-muted truncate">{detail}</span>
       </span>
     </button>

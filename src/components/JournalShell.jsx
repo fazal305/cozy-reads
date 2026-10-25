@@ -20,8 +20,8 @@ const TABS = [
   { id: 'journal', label: 'Journal', short: 'Journal', icon: '📓' },
   { id: 'tbr', label: 'TBR', short: 'TBR', icon: '📌' },
   { id: 'bookshelf', label: 'Bookshelf', short: 'Shelf', icon: '📚' },
-  { id: 'trackers', label: 'Trackers', short: 'Trackers', icon: '📊' },
-  { id: 'challenges', label: 'Challenges', short: 'Challenge', icon: '🏆' },
+  { id: 'trackers', label: 'Trackers', short: 'Track', icon: '📊' },
+  { id: 'challenges', label: 'Challenges', short: 'Quests', icon: '🏆' },
   { id: 'extras', label: 'Extras', short: 'Extras', icon: '🧺' },
   { id: 'stickers', label: 'Stickers', short: 'Stickers', icon: '✨' },
 ];
@@ -50,7 +50,7 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
           </div>
           <div className="flex items-center gap-3">
             <ThemePicker {...themeApi} />
-            <button onClick={onSignOut} className="text-sm text-cozy-muted hover:text-cozy-accent transition">
+            <button onClick={onSignOut} className="text-sm text-cozy-muted hover:text-cozy-accent-ink transition">
               Sign out
             </button>
           </div>
@@ -67,9 +67,10 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
                     selectTab(t.id);
                   }}
                   aria-current={tab === t.id ? 'page' : undefined}
-                  className={`block px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition ${
+                  ref={tab === t.id ? (el) => el?.scrollIntoView({ inline: 'center', block: 'nearest' }) : undefined}
+                  className={`block px-2 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition ${
                     tab === t.id
-                      ? 'border-cozy-accent text-cozy-accent'
+                      ? 'border-cozy-accent text-cozy-accent-ink'
                       : 'border-transparent text-cozy-muted hover:text-cozy-text'
                   }`}
                 >
@@ -111,12 +112,13 @@ export default function JournalShell({ user, onSignOut, goalApi }) {
                   selectTab(t.id);
                 }}
                 aria-current={tab === t.id ? 'page' : undefined}
-                className={`flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition ${
-                  tab === t.id ? 'text-cozy-accent' : 'text-cozy-muted'
+                aria-label={t.label}
+                className={`flex flex-col items-center gap-0.5 py-2 text-[9px] font-medium transition ${
+                  tab === t.id ? 'text-cozy-accent-ink' : 'text-cozy-muted'
                 }`}
               >
                 <span aria-hidden="true" className={`text-lg leading-none ${tab === t.id ? '' : 'opacity-70'}`}>{t.icon}</span>
-                <span className="truncate max-w-full px-0.5">{t.short}</span>
+                <span className="max-w-full">{t.short}</span>
               </a>
             </li>
           ))}

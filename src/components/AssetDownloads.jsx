@@ -61,13 +61,13 @@ export default function AssetDownloads() {
                   onClick={() => handleDownload(asset)}
                   disabled={state.loading}
                   aria-label={`Download ${asset.label}`}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-cozy-accent text-white font-medium hover:brightness-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-xs px-3 py-1.5 rounded-lg bg-cozy-accent-strong text-white font-medium hover:brightness-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {state.loading ? 'Getting link…' : 'Download'}
                 </button>
 
                 {state.error && (
-                  <p role="alert" className="text-xs text-cozy-accent text-right">
+                  <p role="alert" className="text-xs text-cozy-accent-ink text-right">
                     {state.error}
                   </p>
                 )}

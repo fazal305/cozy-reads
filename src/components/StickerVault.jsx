@@ -85,7 +85,7 @@ export default function StickerVault() {
             aria-pressed={activeCategory === cat.id}
             className={`px-3 py-1.5 rounded-xl text-xs font-medium transition ${
               activeCategory === cat.id
-                ? 'bg-cozy-accent text-white shadow-sm'
+                ? 'bg-cozy-accent-strong text-white shadow-sm'
                 : 'bg-cozy-bg text-cozy-text border border-cozy-primary hover:bg-cozy-paper'
             }`}
           >
@@ -141,7 +141,7 @@ export default function StickerVault() {
                     className={`flex-1 py-1 rounded-lg text-[11px] font-medium transition flex items-center justify-center gap-1 ${
                       isCopied
                         ? 'bg-[#408458] text-white'
-                        : 'bg-cozy-paper border border-cozy-primary text-cozy-text hover:bg-cozy-accent hover:text-white hover:border-cozy-accent'
+                        : 'bg-cozy-paper border border-cozy-primary text-cozy-text hover:bg-cozy-accent-strong hover:text-white hover:border-cozy-accent'
                     }`}
                   >
                     <span>{isCopied ? '✓' : '📋'}</span>
@@ -151,7 +151,7 @@ export default function StickerVault() {
                   <button
                     onClick={() => handleDownloadSticker(sticker)}
                     aria-label={`Download ${sticker.name}`}
-                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-cozy-paper border border-cozy-primary text-cozy-text hover:bg-cozy-accent hover:text-white hover:border-cozy-accent transition"
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-cozy-paper border border-cozy-primary text-cozy-text hover:bg-cozy-accent-strong hover:text-white hover:border-cozy-accent transition"
                     title="Download PNG"
                   >
                     ⬇
@@ -166,7 +166,7 @@ export default function StickerVault() {
       {/* Floating Toast Notification */}
       {toastMessage && (
         <div role="status" className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 left-4 sm:left-auto z-50 bg-cozy-paper border border-cozy-primary shadow-lg rounded-2xl px-5 py-3 text-sm text-cozy-text flex items-center gap-3 animate-fade-in max-w-sm">
-          <span className="text-cozy-accent text-lg">🌸</span>
+          <span className="text-cozy-accent-ink text-lg">🌸</span>
           <span className="text-xs leading-snug">{toastMessage}</span>
         </div>
       )}
