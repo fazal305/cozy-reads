@@ -1,0 +1,31 @@
+import { fontCss } from './templates';
+
+export function isHttpsUrl(value) {
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export function boxStyle(item) {
+  return {
+    left: `${item.x * 100}%`,
+    top: `${item.y * 100}%`,
+    width: `${item.w * 100}%`,
+    height: item.type === 'text' ? undefined : `${item.h * 100}%`,
+    transform: item.r ? `rotate(${item.r}deg)` : undefined,
+  };
+}
+
+export function textStyle(item) {
+  return {
+    fontFamily: fontCss(item.font),
+    fontSize: `${item.size * 100}cqw`,
+    color: item.color,
+    lineHeight: 1.25,
+    padding: '0.1em 0.15em',
+    whiteSpace: 'pre-wrap',
+    overflowWrap: 'anywhere',
+  };
+}
