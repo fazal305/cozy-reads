@@ -69,7 +69,7 @@ export default function HomeTab({ books, goalApi, openEditor, onSelectTab }) {
       {!loading && error && (
         <div className="bg-cozy-card rounded-2xl border border-red-200 dark:border-red-900 p-6 text-center space-y-3">
           <p className="text-cozy-text">{error}</p>
-          <button onClick={refetch} className="text-sm px-4 py-2 rounded-lg bg-cozy-accent text-white hover:bg-[#d97979] transition">
+          <button onClick={refetch} className="text-sm px-4 py-2 rounded-lg bg-cozy-accent text-white hover:brightness-95 transition">
             Try again
           </button>
         </div>

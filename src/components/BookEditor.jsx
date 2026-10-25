@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import BookCover from './BookCover';
 import RatingInput from './RatingInput';
 import { TROPES } from '../data/tropes';
-import { STATUSES, FORMATS, SEASONS, MOODS, GENRES } from '../lib/bookMeta';
+import { STATUSES, FORMATS, SEASONS, MOODS, GENRES, SPINE_SWATCHES, SPINE_STYLES, spineStyle } from '../lib/bookMeta';
 import { input, pill, primaryButton, softButton } from '../lib/ui';
 
 const STAR = <span className="text-amber-400">★</span>;
@@ -380,6 +380,72 @@ export default function BookEditor({ book, defaults, booksApi, onClose }) {
                   className="w-full text-xs text-cozy-muted file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-cozy-primary file:text-xs file:bg-cozy-paper file:text-cozy-text file:cursor-pointer"
                 />
                 <input type="url" aria-label="Cover image URL" className={input} value={form.cover_url} onChange={(e) => set('cover_url', e.target.value)} placeholder="Or paste cover image URL…" />
+              </div>
+            </Section>
+
+            <Section title="Bookshelf spine">
+              <div className="flex gap-4 items-start">
+                <div
+                  aria-hidden="true"
+                  style={spineStyle(form)}
+                  className="w-7 h-24 shrink-0 rounded-t-sm shadow-[inset_-3px_0_0_rgba(0,0,0,0.18),inset_2px_0_0_rgba(255,255,255,0.15)]"
+                />
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div className="space-y-1.5">
+                    <p id="ed-spine-color" className="text-xs font-medium text-cozy-text">Spine colour</p>
+                    <div role="radiogroup" aria-labelledby="ed-spine-color" className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={!form.extra.spine_color}
+                        onClick={() => setExtra('spine_color', '')}
+                        title="Auto (by genre)"
+                        className={`h-7 px-2.5 rounded-full text-[11px] font-medium border transition ${
+                          !form.extra.spine_color ? 'bg-cozy-accent text-white border-cozy-accent' : 'bg-cozy-bg text-cozy-text border-cozy-primary hover:border-cozy-accent'
+                        }`}
+                      >
+                        Auto
+                      </button>
+                      {SPINE_SWATCHES.map((s) => {
+                        const active = form.extra.spine_color === s.color;
+                        return (
+                          <button
+                            key={s.color}
+                            type="button"
+                            role="radio"
+                            aria-checked={active}
+                            aria-label={s.label}
+                            title={s.label}
+                            onClick={() => setExtra('spine_color', s.color)}
+                            style={{ backgroundColor: s.color }}
+                            className={`w-7 h-7 rounded-full border border-black/10 transition ${
+                              active ? 'ring-2 ring-cozy-accent ring-offset-2 ring-offset-cozy-card' : 'hover:scale-110'
+                            }`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-medium text-cozy-text">Spine pattern</p>
+                    <div className="flex flex-wrap gap-1.5" role="group" aria-label="Spine pattern">
+                      {SPINE_STYLES.map((st) => {
+                        const active = (form.extra.spine_style || 'plain') === st.key;
+                        return (
+                          <button
+                            key={st.key}
+                            type="button"
+                            onClick={() => setExtra('spine_style', st.key === 'plain' ? '' : st.key)}
+                            aria-pressed={active}
+                            className={pill(active)}
+                          >
+                            {st.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               </div>
             </Section>
 

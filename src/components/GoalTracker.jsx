@@ -76,7 +76,7 @@ export default function GoalTracker({ goal, onLogBook, onUpdateChallenge }) {
           onClick={handleLog}
           disabled={logLoading}
           aria-label="Log a finished book"
-          className="relative inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cozy-accent text-white font-medium text-sm shadow-sm hover:bg-[#d97979] active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cozy-accent text-white font-medium text-sm shadow-sm hover:brightness-95 active:scale-95 transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <span aria-hidden="true">♥</span>
           {logLoading ? 'Saving…' : 'I finished a book!'}
